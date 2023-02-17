@@ -195,3 +195,7 @@ class Grain_Image(Grain_Tempo):
         self.l_border.append(self.real.l_border[i].copy() + U)
         self.l_border_x.append(self.real.l_border[i][0].copy() + U[0])
         self.l_border_y.append(self.real.l_border[i][1].copy() + U[1])
+    #update data
+    self.v = self.real.v.copy()
+    self.w = self.real.w
+    self.theta = self.real.theta
