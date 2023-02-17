@@ -18,6 +18,7 @@ import matplotlib.pyplot as plt
 #Own
 import Create_IC.Grain_ic
 import Create_IC.Contact_gg_ic
+import Create_IC.Contact_gimage_ic
 import Create_IC.Contact_gw_ic
 
 #-------------------------------------------------------------------------------
@@ -256,7 +257,7 @@ def DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollic
             else :
                 print('i_DEM',dict_ic['i_DEM_IC'],'and Ecin',int(100*Ecin/Ecin_stop),'% and Confinement',int(100*Fv/dict_sollicitation['Vertical_Confinement_Force']),'%')
             if dict_ic['Debug_DEM'] :
-                Plot_Config_Loaded(dict_ic['L_g_tempo'],dict_sample['x_box_min'],dict_sample['x_box_max'],y_min,dict_sample['y_box_max'],dict_ic['i_DEM_IC'])
+                Plot_Config_Loaded(dict_ic,dict_sample['x_box_min'],dict_sample['x_box_max'],y_min,dict_sample['y_box_max'],dict_ic['i_DEM_IC'])
 
         #Check stop conditions for DEM
         if dict_ic['i_DEM_IC'] >= dict_ic['i_DEM_stop_IC'] + i_DEM_0:
@@ -479,7 +480,7 @@ def Reset_y_max(L_g,Force):
 
 #-------------------------------------------------------------------------------
 
-def Plot_Config_Loaded(L_g,x_min,x_max,y_min,y_max,i):
+def Plot_Config_Loaded(dict_ic,x_min,x_max,y_min,y_max,i):
     """
     Plot loaded configuration.
 
@@ -491,25 +492,21 @@ def Plot_Config_Loaded(L_g,x_min,x_max,y_min,y_max,i):
             Nothing, but a .png file is generated (a file)
     """
     plt.figure(1,figsize=(16,9))
-    L_x = []
-    L_y = []
-    L_u = []
-    L_v = []
-    for grain in L_g:
+    for grain in dict_ic['L_g_tempo']:
         plt.plot(grain.l_border_x,grain.l_border_y,'k')
         plt.plot(grain.center[0],grain.center[1],'xk')
-        L_x.append(grain.center[0])
-        L_y.append(grain.center[1])
-        L_u.append(grain.fx)
-        L_v.append(grain.fy)
-    plt.plot([x_min,x_min,x_max,x_max,x_min],[y_max,y_min,y_min,y_max,y_max],'k')
+    for grain in dict_ic['L_g_image']:
+        plt.plot(grain.l_border_x,grain.l_border_y,'-.k')
+        plt.plot(grain.center[0],grain.center[1],'xk')
+    plt.plot([x_min,x_max],[y_min,y_min],'k')
+    plt.plot([x_min,x_max],[y_max,y_max],'k')
     plt.axis('equal')
     plt.savefig('Debug/Configuration/Init/Config_Loaded_'+str(i)+'.png')
     plt.close(1)
 
 #-------------------------------------------------------------------------------
 
-def Plot_Config_Loaded_End(L_g,x_min,x_max,y_min,y_max):
+def Plot_Config_Loaded_End(dict_ic,x_min,x_max,y_min,y_max):
     """
     Plot loaded configuration at the end of the initial configuration.
 
@@ -521,18 +518,14 @@ def Plot_Config_Loaded_End(L_g,x_min,x_max,y_min,y_max):
             Nothing, but a .png file is generated (a file)
     """
     plt.figure(1,figsize=(16,9))
-    L_x = []
-    L_y = []
-    L_u = []
-    L_v = []
-    for grain in L_g:
+    for grain in dict_ic['L_g_tempo']:
         plt.plot(grain.l_border_x,grain.l_border_y,'k')
         plt.plot(grain.center[0],grain.center[1],'xk')
-        L_x.append(grain.center[0])
-        L_y.append(grain.center[1])
-        L_u.append(grain.fx)
-        L_v.append(grain.fy)
-    plt.plot([x_min,x_min,x_max,x_max,x_min],[y_max,y_min,y_min,y_max,y_max],'k')
+    for grain in dict_ic['L_g_image']:
+        plt.plot(grain.l_border_x,grain.l_border_y,'-.k')
+        plt.plot(grain.center[0],grain.center[1],'xk')
+    plt.plot([x_min,x_max],[y_min,y_min],'k')
+    plt.plot([x_min,x_max],[y_max,y_max],'k')
     plt.axis('equal')
     plt.savefig('Debug/ConfigLoaded.png')
     plt.close(1)
