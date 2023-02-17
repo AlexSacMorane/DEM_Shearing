@@ -52,6 +52,7 @@ class Grain_Tempo:
     L_border_x.append(L_border_x[0])
     L_border_y.append(L_border_y[0])
     #save
+    self.group = 'Current'
     self.radius = Radius
     self.theta = 0
     self.rho_surf = dict_material['rho_surf']

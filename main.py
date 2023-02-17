@@ -24,20 +24,16 @@ import Report
 import User
 
 #-------------------------------------------------------------------------------
-#User
+#IC simulation
 #-------------------------------------------------------------------------------
 
-grain_discretization_L = [20,30,40]
+if Path('Debug').exists():
+    shutil.rmtree('Debug')
+os.mkdir('Debug')
+os.mkdir('Debug/Configuration')
+os.mkdir('Debug/Configuration/Init')
 
-#-------------------------------------------------------------------------------
-#Plan simulation
-#-------------------------------------------------------------------------------
-
-for grain_discretization in grain_discretization_L :
-    if not Path('ICs/'+str(grain_discretization)).exists():
-        os.mkdir('ICs/'+str(grain_discretization))
-
-simulation_report = Report.Report('Report',datetime.now())
+simulation_report = Report.Report('Debug/Report.txt',datetime.now())
 
 #get data
 dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations = User.All_parameters()
@@ -53,62 +49,18 @@ dict_algorithm['name_folder'] = dict_algorithm['template_simulation_name']+str(i
 #initial ic
 Create_IC.LG_tempo(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
 
-#save
-outfile = open('ICs/'+dict_algorithm['name_folder']+'_dict_ic','wb')
-pickle.dump(dict_ic,outfile)
-outfile.close()
+#-------------------------------------------------------------------------------
+#Shear simulation
+#-------------------------------------------------------------------------------
 
-#prepare plot
-plt.figure(1,figsize=(16,9))
+#define periodic bc
 
-#work on discretization
-for grain_discretization in grain_discretization_L :
-    dict_geometry['grain_discretization'] = grain_discretization
-
-    #load perfect sphere data
-    infile = open('ICs/'+dict_algorithm['name_folder']+'_dict_ic','rb')
-    dict_ic = pickle.load(infile,encoding ='byte')
-    infile.close()
-
-    #convert into discrete grains
-    dict_ic_discrete = Create_IC_Polygonal.Discretize_Grains(dict_ic, grain_discretization)
-
-    #load discrete grains
-    Create_IC_Polygonal.DEM_loading(dict_algorithm, dict_ic_discrete, dict_material, dict_sample, dict_sollicitations, simulation_report)
-
-    #plot
-    plt.subplot(221)
-    plt.plot(dict_ic_discrete['Ecin_tracker'], label = 'n border = '+str(grain_discretization))
-    plt.subplot(222)
-    plt.plot(dict_ic_discrete['k0_tracker'], label = 'n border = '+str(grain_discretization))
-    plt.subplot(223)
-    plt.plot(dict_ic_discrete['Ymax_tracker'], label = 'n border = '+str(grain_discretization))
-    plt.subplot(224)
-    plt.plot(dict_ic_discrete['Fv_tracker'], label = 'n border = '+str(grain_discretization))
-
-    #save
-    outfile = open('ICs/'+str(grain_discretization)+'/'+dict_algorithm['name_folder']+'_dict_ic','wb')
-    pickle.dump(dict_ic_discrete,outfile)
-    outfile.close()
-
-    #Interface user
-    print()
-    print('Loading discretization '+str(grain_discretization)+' done')
-    print()
-
-#close plot
-plt.subplot(221)
-plt.title('Ecin')
-plt.legend()
-plt.subplot(222)
-plt.title(r'k0 = $\sigma_2$ / $\sigma_1$')
-plt.legend()
-plt.subplot(223)
-plt.title('Upper wall position')
-plt.legend()
-plt.subplot(224)
-plt.title('Force on upper wall')
-plt.legend()
-
-plt.savefig('ICs/'+dict_algorithm['name_folder']+'.png')
-plt.close(1)
+#define packs
+i_bottom = 0
+i_top = 0
+for grain in dict_ic['L_g_tempo'] :
+    if grain.is_group(0, 2*dict_geometry['R_mean'], 'Bottom') :
+        i_bottom = i_bottom + 1
+    elif grain.is_group(dict_sample['y_box_max']-2*dict_geometry['R_mean'], dict_sample['y_box_max'], 'Top') :
+        i_top = i_top + 1
+simulation_report.write_and_print(str(i_bottom)+' grains in Bottom group\n'+str(i_top)+' grains in Top group\n', str(i_bottom)+' grains in Bottom group\n'+str(i_top)+' grains in Top group')
