@@ -215,14 +215,23 @@ def DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollic
         for grain in dict_ic['L_g_tempo']:
             grain.euler_semi_implicite(dict_ic['dt_DEM_IC'],10*dict_ic['Ecin_ratio_IC'])
 
+        #periodic condition
+        for grain in dict_ic['L_g_tempo']:
+            if grain.center[0] < dict_sample['x_box_min'] :
+                grain.center = grain.center.copy() + np.array([dict_sample['x_box_max'] - dict_sample['x_box_min'], 0])
+                for i in range(len(grain.l_border)):
+                    grain.l_border.append(grain.l_border[i].copy() + np.array([dict_sample['x_box_max'] - dict_sample['x_box_min'], 0]))
+                    grain.l_border_x.append(grain.l_border[i][0].copy() + dict_sample['x_box_max'] - dict_sample['x_box_min'])
+            elif grain.center[0] > dict_sample['x_box_max'] :
+                grain.center = grain.center.copy() + np.array([dict_sample['x_box_min'] - dict_sample['x_box_max'], 0])
+                for i in range(len(grain.l_border)):
+                    grain.l_border.append(grain.l_border[i].copy() + np.array([dict_sample['x_box_min'] - dict_sample['x_box_max'], 0]))
+                    grain.l_border_x.append(grain.l_border[i][0].copy() + dict_sample['x_box_min'] - dict_sample['x_box_max'])
+
         #check if some grains are outside of the study box
         L_ig_to_delete = []
         for id_grain in range(len(dict_ic['L_g_tempo'])):
-            if dict_ic['L_g_tempo'][id_grain].center[0] < dict_sample['x_box_min'] :
-                L_ig_to_delete.append(id_grain)
-            elif dict_ic['L_g_tempo'][id_grain].center[0] > dict_sample['x_box_max'] :
-                L_ig_to_delete.append(id_grain)
-            elif dict_ic['L_g_tempo'][id_grain].center[1] < y_min :
+            if dict_ic['L_g_tempo'][id_grain].center[1] < y_min :
                 L_ig_to_delete.append(id_grain)
             elif dict_ic['L_g_tempo'][id_grain].center[1] > dict_sample['y_box_max'] :
                 L_ig_to_delete.append(id_grain)
