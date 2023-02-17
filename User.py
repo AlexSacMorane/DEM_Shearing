@@ -125,6 +125,7 @@ def All_parameters():
     factor_neighborhood = 1.5 #margin to detect a grain into a neighborhood
     i_update_neighborhoods = 100 #the frequency of the update of the neighborhood of the grains and the walls
     Spring_type = 'Ponctual' #Kind of contact
+    d_to_image = 2 * R_mean
     #Stop criteria of the DEM
     i_DEM_stop = 3000 #maximum iteration for one DEM simulation
     Ecin_ratio = 0.0002
@@ -157,6 +158,7 @@ def All_parameters():
     'dy_local' : dy_local,
     'dt_DEM' : dt_DEM,
     'i_update_neighborhoods': i_update_neighborhoods,
+    'd_to_image' : d_to_image,
     'i_DEM_stop' : i_DEM_stop,
     'Ecin_ratio' : Ecin_ratio,
     'n_window_stop' : n_window_stop,
