@@ -20,7 +20,7 @@ import Create_IC.Grain_ic
 #Class
 #-------------------------------------------------------------------------------
 
-class Contact_Tempo:
+class Contact_Image:
   """
   A temporary contact grain - image used to generated an initial condition.
   """
@@ -85,7 +85,6 @@ class Contact_Tempo:
         self.F_2_1_n = F_2_1_n
         self.Ep_n = 2/5 * k * overlap**(5/2) #-dEp/dx = F_2_1_n
         self.g1.add_F( F_2_1, self.g1.center + self.g1.radius*self.pc_normal)
-        self.g2.add_F(-F_2_1, self.g2.center - self.g2.radius*self.pc_normal)
 
         #Damping term
         gamma = -math.log(self.coeff_restitution)/math.sqrt(math.pi**2+math.log(self.coeff_restitution)**2)
@@ -95,7 +94,6 @@ class Contact_Tempo:
         F_2_1_damp = F_2_1_damp_n *PC_normal
         self.F_2_1_damp = F_2_1_damp_n
         self.g1.add_F( F_2_1_damp, self.g1.center + self.g1.radius*self.pc_normal)
-        self.g2.add_F(-F_2_1_damp, self.g2.center - self.g2.radius*self.pc_normal)
 
     #no contact finally
     else :
@@ -141,7 +139,6 @@ class Contact_Tempo:
             self.ft = self.mu * abs(self.F_2_1_n) * np.sign(self.ft)
 
         self.g1.add_F( self.ft*self.pc_tangential, self.g1.center + self.g1.radius*self.pc_normal)
-        self.g2.add_F(-self.ft*self.pc_tangential, self.g2.center - self.g2.radius*self.pc_normal)
 
         #Damping term
         gamma = -math.log(self.coeff_restitution)/math.sqrt(math.pi**2+math.log(self.coeff_restitution)**2)
@@ -151,7 +148,6 @@ class Contact_Tempo:
         F_2_1_damp = F_2_1_damp_t *self.pc_tangential
         self.ft_damp = F_2_1_damp_t
         self.g1.add_F( F_2_1_damp, self.g1.center + self.g1.radius*self.pc_normal)
-        self.g2.add_F(-F_2_1_damp, self.g2.center - self.g2.radius*self.pc_normal)
 
     #no contact finally
     else :
@@ -190,13 +186,12 @@ def Update_Neighborhoods(dict_ic):
         Output :
             Nothing, but the neighborhood of the temporary grains is updated
     """
-    for i_grain in range(len(dict_ic['L_g_tempo'])-1) :
+    for grain in dict_ic['L_g_tempo'] :
         neighborhood = []
-        for j_grain in range(i_grain+1,len(dict_ic['L_g_tempo'])):
-            if np.linalg.norm(dict_ic['L_g_tempo'][i_grain].center-dict_ic['L_g_tempo'][j_grain].center) < dict_ic['factor_neighborhood_IC']*(dict_ic['L_g_tempo'][i_grain].radius+dict_ic['L_g_tempo'][j_grain].radius):
-                neighborhood.append(dict_ic['L_g_tempo'][j_grain])
-        dict_ic['L_g_tempo'][i_grain].neighbourood = neighborhood
-
+        for image in dict_ic['L_g_image']:
+            if np.linalg.norm(grain.center-image.center) < dict_ic['factor_neighborhood_IC']*(grain.radius+image.radius):
+                neighborhood.append(image)
+        grain.neighbourood_image = neighborhood
 
 #-------------------------------------------------------------------------------
 
@@ -212,19 +207,19 @@ def Grains_contact_Neighborhoods(dict_ic,dict_material):
         Output :
             Nothing, but the initial condition dictionnary is updated with grain - grain contacts
     """
-    for i_grain in range(len(dict_ic['L_g_tempo'])-1) :
-        grain_i = dict_ic['L_g_tempo'][i_grain]
-        for neighbor in dict_ic['L_g_tempo'][i_grain].neighbourood:
+    for i_grain in range(len(dict_ic['L_g_tempo'])) :
+        grain = dict_ic['L_g_tempo'][i_grain]
+        for neighbor in grain.neighbourood_image:
             j_grain = neighbor.id
-            grain_j = neighbor
-            if Grains_contact_f(grain_i,grain_j):
-                if (i_grain,j_grain) not in dict_ic['L_contact_ij']:  #contact not detected previously
+            image = neighbor
+            if Grains_contact_f(grain,image):
+                if (i_grain,j_grain) not in dict_ic['L_contact_ij_gimage']:  #contact not detected previously
                    #creation of contact
-                   dict_ic['L_contact_ij'].append((i_grain,j_grain))
-                   dict_ic['L_contact'].append(Contact_Tempo(dict_ic['id_contact'], grain_i, grain_j, dict_material))
+                   dict_ic['L_contact_ij_gimage'].append((i_grain,j_grain))
+                   dict_ic['L_contact_gimage'].append(Contact_Image(dict_ic['id_contact'], grain, image, dict_material))
                    dict_ic['id_contact'] = dict_ic['id_contact'] + 1
 
             else :
-                if (i_grain,j_grain) in dict_ic['L_contact_ij'] : #contact detected previously is not anymore
-                       dict_ic['L_contact'].pop(dict_ic['L_contact_ij'].index((i_grain,j_grain)))
-                       dict_ic['L_contact_ij'].remove((i_grain,j_grain))
+                if (i_grain,j_grain) in dict_ic['L_contact_ij_gimage'] : #contact detected previously is not anymore
+                       dict_ic['L_contact_gimage'].pop(dict_ic['L_contact_ij_gimage'].index((i_grain,j_grain)))
+                       dict_ic['L_contact_ij_gimage'].remove((i_grain,j_grain))
