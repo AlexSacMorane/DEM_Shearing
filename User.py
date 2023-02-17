@@ -184,8 +184,8 @@ def All_parameters():
     factor_ymax_box = 1.8 #margin to generate grains
     N_test_max = 5000 # maximum number of tries to generate a grain without overlap
     i_DEM_stop_IC = 4000 #stop criteria for DEM during IC
-    Debug_DEM_IC = False #plot configuration inside DEM during IC
-    i_print_plot_IC = 400 #frenquency of the print and plot (if Debug_DEM_IC) for IC
+    Debug_DEM_IC = True #plot configuration inside DEM during IC
+    i_print_plot_IC = 100 #frenquency of the print and plot (if Debug_DEM_IC) for IC
     dt_DEM_IC = dt_DEM_crit/6 #s time step during IC
     Ecin_ratio_IC = 0.0005
     factor_neighborhood_IC = 1.5 #margin to detect a grain into a neighborhood
