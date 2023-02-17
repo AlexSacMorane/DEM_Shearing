@@ -140,6 +140,8 @@ def DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollic
     #Initialisation
     dict_ic['L_contact'] = []
     dict_ic['L_contact_ij'] = []
+    dict_ic['L_contact_gimage'] = []
+    dict_ic['L_contact_ij_gimage'] = []
     dict_ic['L_contact_gw'] = []
     dict_ic['L_contact_gw_ij'] = []
     dict_ic['id_contact'] = 0
@@ -198,7 +200,9 @@ def DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollic
         #Contact detection
         if (dict_ic['i_DEM_IC']-i_DEM_0-1) % i_update_neighborhoods  == 0:
             Contact_gg_ic.Update_Neighborhoods(dict_ic)
+            Contact_gimage_ic.Update_Neighborhoods(dict_ic)
         Contact_gg_ic.Grains_contact_Neighborhoods(dict_ic,dict_material)
+        Contact_gimage_ic.Grains_contact_Neighborhoods(dict_ic,dict_material)
 
         # Detection of contacts between grain and walls
         if (dict_ic['i_DEM_IC']-i_DEM_0-1) % i_update_neighborhoods  == 0:
@@ -208,7 +212,7 @@ def DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollic
         #Sollicitation computation
         for grain in dict_ic['L_g_tempo']:
              grain.init_F_control(dict_sollicitation['gravity'])
-        for contact in  dict_ic['L_contact']+dict_ic['L_contact_gw']:
+        for contact in  dict_ic['L_contact']+dict_ic['L_contact_gimage']+dict_ic['L_contact_gw']:
             contact.normal()
             contact.tangential(dict_ic['dt_DEM_IC'])
 
@@ -221,13 +225,13 @@ def DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollic
             if grain.center[0] < dict_sample['x_box_min'] :
                 grain.center = grain.center.copy() + np.array([dict_sample['x_box_max'] - dict_sample['x_box_min'], 0])
                 for i in range(len(grain.l_border)):
-                    grain.l_border.append(grain.l_border[i].copy() + np.array([dict_sample['x_box_max'] - dict_sample['x_box_min'], 0]))
-                    grain.l_border_x.append(grain.l_border[i][0].copy() + dict_sample['x_box_max'] - dict_sample['x_box_min'])
+                    grain.l_border[i] = grain.l_border[i].copy() + np.array([dict_sample['x_box_max'] - dict_sample['x_box_min'], 0])
+                    grain.l_border_x[i] = grain.l_border_x[i].copy() + dict_sample['x_box_max'] - dict_sample['x_box_min']
             elif grain.center[0] > dict_sample['x_box_max'] :
                 grain.center = grain.center.copy() + np.array([dict_sample['x_box_min'] - dict_sample['x_box_max'], 0])
                 for i in range(len(grain.l_border)):
-                    grain.l_border.append(grain.l_border[i].copy() + np.array([dict_sample['x_box_min'] - dict_sample['x_box_max'], 0]))
-                    grain.l_border_x.append(grain.l_border[i][0].copy() + dict_sample['x_box_min'] - dict_sample['x_box_max'])
+                    grain.l_border[i] = grain.l_border[i].copy() + np.array([dict_sample['x_box_min'] - dict_sample['x_box_max'], 0])
+                    grain.l_border_x[i] = grain.l_border_x[i].copy() + dict_sample['x_box_min'] - dict_sample['x_box_max']
 
         #check if some grains are outside of the study box
         L_ig_to_delete = []
