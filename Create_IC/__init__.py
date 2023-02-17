@@ -142,6 +142,8 @@ def DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollic
     dict_ic['L_contact_gw'] = []
     dict_ic['L_contact_gw_ij'] = []
     dict_ic['id_contact'] = 0
+    dict_ic['L_g_image'] = []
+    dict_ic['L_i_image'] = []
 
     #trackers and stop conditions
     Force_tracker = []
@@ -157,6 +159,40 @@ def DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollic
     while DEM_loop_statut :
 
         dict_ic['i_DEM_IC'] = dict_ic['i_DEM_IC'] + 1
+
+        #create image
+        #what about the contact continuation
+        for grain in dict_ic['L_g_tempo']:
+            #left wall
+            if (grain.center[0] - dict_sample['x_box_min']) < dict_algorithm['d_to_image'] :
+                if grain.id in dict_ic['L_i_image'] : #image exists
+                    image = dict_ic['L_g_image'][dict_ic['L_i_image'].index(grain.id)]
+                    if image.position == 'right' :
+                        image.position = 'left'
+                else : #image does not exist
+                    dict_ic['L_g_image'].append(Grain_ic.Grain_Image(grain, 'left'))
+                    dict_ic['L_i_image'].append(grain.id)
+            #right wall
+            elif (dict_sample['x_box_max'] - grain.center[0]) < dict_algorithm['d_to_image'] :
+                if grain.id in dict_ic['L_i_image'] : #image exists
+                    image = dict_ic['L_g_image'][dict_ic['L_i_image'].index(grain.id)]
+                    if image.position == 'left' :
+                        image.position = 'right'
+                else : #image does not exist
+                    dict_ic['L_g_image'].append(Grain_ic.Grain_Image(grain, 'right'))
+                    dict_ic['L_i_image'].append(grain.id)
+            #center
+            else :
+                if grain.id in dict_ic['L_i_image'] : #image exists
+                    i_toremove = dict_ic['L_i_image'].index(grain.id)
+                    dict_ic['L_g_image'].pop(i_toremove)
+                    dict_ic['L_i_image'].pop(i_toremove)
+        #translate image
+        for image in dict_ic['L_g_image']:
+            if image.position == 'left' :
+                image.translation(np.array([dict_sample['x_box_max'] - dict_sample['x_box_min'], 0]))
+            elif image.position == 'right' :
+                image.translation(np.array([dict_sample['x_box_min'] - dict_sample['x_box_max'], 0]))
 
         #Contact detection
         if (dict_ic['i_DEM_IC']-i_DEM_0-1) % i_update_neighborhoods  == 0:

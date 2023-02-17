@@ -53,6 +53,7 @@ class Grain_Tempo:
     L_border_y.append(L_border_y[0])
     #save
     self.group = 'Current'
+    self.image = None
     self.radius = Radius
     self.theta = 0
     self.rho_surf = dict_material['rho_surf']
@@ -137,3 +138,60 @@ class Grain_Tempo:
     dw_i = self.mz/self.inertia
     self.w = self.w + dw_i*dt_DEM
     self.theta = self.theta + self.w*dt_DEM
+
+#-------------------------------------------------------------------------------
+
+class Grain_Image(Grain_Tempo):
+  """
+  An image grain used to generated an initial condition.
+  """
+
+#-------------------------------------------------------------------------------
+
+  def __init__(self, real_grain, position):
+    """Defining the image of a real grain.
+
+        Input :
+            itself (a grain_image)
+            a real grain (a grain_tempo)
+        Output :
+            Nothing, but an image grain is generated (a grain_image)
+    """
+    real_grain.image = self
+    self.real = real_grain
+    self.position = position
+    self.group = real_grain.group
+    self.radius = real_grain.radius
+    self.theta = real_grain.theta
+    self.rho_surf = real_grain.rho_surf
+    self.surface = real_grain.surface
+    self.mass = real_grain.mass
+    self.inertia = real_grain.inertia
+    self.id = real_grain.id
+    self.y = real_grain.y
+    self.nu = real_grain.nu
+    self.g = real_grain.g
+    self.fx = real_grain.fx
+    self.fy = real_grain.fy
+    self.v = real_grain.v.copy()
+    self.w = real_grain.w
+
+#-------------------------------------------------------------------------------
+
+  def translation(self, U):
+    """Translate an image grain depending on the tempo grain.
+
+        Input :
+            itself (a grain_image)
+            a real grain (a grain_tempo)
+        Output :
+            Nothing, but an image grain is generated (a grain_image)
+    """
+    self.center = self.real.center.copy() + U
+    self.l_border = []
+    self.l_border_x = []
+    self.l_border_y = []
+    for i in range(len(self.real.l_border)):
+        self.l_border.append(self.real.l_border[i].copy() + U)
+        self.l_border_x.append(self.real.l_border[i][0].copy() + U[0])
+        self.l_border_y.append(self.real.l_border[i][1].copy() + U[1])
