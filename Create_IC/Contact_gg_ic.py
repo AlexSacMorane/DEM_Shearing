@@ -3,7 +3,7 @@
 @author: Alexandre Sac--Morane
 alexandre.sac-morane@uclouvain.be
 
-This file contains ??.nt functions used in the simulation.
+This file contains some functions used in the simulation.
 """
 
 #-------------------------------------------------------------------------------
