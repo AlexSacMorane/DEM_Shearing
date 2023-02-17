@@ -141,6 +141,26 @@ class Grain_Tempo:
 
 #-------------------------------------------------------------------------------
 
+  def is_group(self, ymin, ymax, name_group):
+      """
+      Check if a grain is in a determined group by comparing center y-coordinate with two limits.
+
+        Input :
+            itself (a grain_tempo)
+            two y limits (two floats)
+            a name (a string)
+        Output :
+            a Boolean and the attribut group is updated (a string) 
+
+      """
+      if ymin <= self.center[1] and self.center[1] <= ymax:
+          self.group = name_group
+          return True
+      else :
+          return False
+
+#-------------------------------------------------------------------------------
+
 class Grain_Image(Grain_Tempo):
   """
   An image grain used to generated an initial condition.
