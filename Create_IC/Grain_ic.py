@@ -138,7 +138,7 @@ class Grain_Tempo:
     dw_i = self.mz/self.inertia
     self.w = self.w + dw_i*dt_DEM
     self.theta = self.theta + self.w*dt_DEM
-
+      
 #-------------------------------------------------------------------------------
 
   def is_group(self, ymin, ymax, name_group):
@@ -150,7 +150,7 @@ class Grain_Tempo:
             two y limits (two floats)
             a name (a string)
         Output :
-            a Boolean and the attribut group is updated (a string) 
+            a Boolean and the attribut group is updated (a string)
 
       """
       if ymin <= self.center[1] and self.center[1] <= ymax:

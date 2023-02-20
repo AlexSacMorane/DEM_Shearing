@@ -221,19 +221,196 @@ def DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollic
             grain.euler_semi_implicite(dict_ic['dt_DEM_IC'],10*dict_ic['Ecin_ratio_IC'])
 
         #periodic condition
-        #contact grain_image must become a contact grain_grain
-        #contact grain_grain must become a contact grain_image
         for grain in dict_ic['L_g_tempo']:
+            #left wall
             if grain.center[0] < dict_sample['x_box_min'] :
                 grain.center = grain.center.copy() + np.array([dict_sample['x_box_max'] - dict_sample['x_box_min'], 0])
                 for i in range(len(grain.l_border)):
                     grain.l_border[i] = grain.l_border[i].copy() + np.array([dict_sample['x_box_max'] - dict_sample['x_box_min'], 0])
                     grain.l_border_x[i] = grain.l_border_x[i].copy() + dict_sample['x_box_max'] - dict_sample['x_box_min']
+                #contact gimage needed to be convert into gg
+                L_i_contact_to_delete = []
+                for ij_gimage in dict_ic['L_contact_ij_gimage'] :
+                    i_contact_gimage = dict_ic['L_contact_ij_gimage'].index(ij_gimage)
+                    if ij_gimage[0] == grain.id or ij_gimage[1] == grain.id:
+                        if ij_gimage[0] > ij_gimage[1] :
+                            ij_gg = (ij_gimage[1], ij_gimage[0])
+                        else :
+                            ij_gg = ij_gimage
+                        grain_i = dict_ic['L_g_tempo'][0]
+                        i_grain = 0
+                        while not grain_i.id == ij_gg[0] :
+                            i_grain = i_grain + 1
+                            grain_i = dict_ic['L_g_tempo'][i_grain]
+                        j_grain = i_grain + 1
+                        grain_j = dict_ic['L_g_tempo'][j_grain]
+                        while not grain_j.id == ij_gg[1] :
+                            j_grain = j_grain + 1
+                            grain_j = dict_ic['L_g_tempo'][j_grain]
+                        if ij_gg not in dict_ic['L_contact_ij'] :
+                            #creation of contact
+                            dict_ic['L_contact_ij'].append(ij_gg)
+                            dict_ic['L_contact'].append(Create_IC.Contact_gg_ic.Contact_Tempo(dict_ic['id_contact'], grain_i, grain_j, dict_material))
+                            dict_ic['id_contact'] = dict_ic['id_contact'] + 1
+                            #transmit data
+                            dict_ic['L_contact'][-1].convert_gimage_in_gg(dict_ic['L_contact_gimage'][i_contact_gimage])
+                            #update neighborhood
+                            grain_i.neighbourood.append(grain_j)
+                        L_i_contact_to_delete.append(i_contact_gimage)
+                #delete previous contact gimage
+                L_i_contact_to_delete.reverse()
+                for i_contact_to_delete in L_i_contact_to_delete :
+                    dict_ic['L_contact_gimage'].pop(i_contact_to_delete)
+                    dict_ic['L_contact_ij_gimage'].pop(i_contact_to_delete)
+                #contact gg needed to be convert into gimage
+                L_i_contact_to_delete = []
+                for ij_gg in dict_ic['L_contact_ij'] :
+                    i_contact_ij = dict_ic['L_contact_ij'].index(ij_gg)
+                    if ij_gg[0] == grain.id or ij_gg[1] == grain.id:
+                        ij_gimage = ij_gg
+                        #contact gimage 1
+                        i_grain = 0
+                        grain = dict_ic['L_g_tempo'][i_grain]
+                        while not grain.id == ij_gimage[0] :
+                            i_grain = i_grain + 1
+                            grain = dict_ic['L_g_tempo'][i_grain]
+                        i_image = 0
+                        image = dict_ic['L_g_image'][i_image]
+                        while not image.id == ij_gimage[1] :
+                            i_image = i_image + 1
+                            image = dict_ic['L_g_image'][i_image]
+                        #creation of contact
+                        dict_ic['L_contact_ij_gimage'].append(ij_gimage)
+                        dict_ic['L_contact_gimage'].append(Create_IC.Contact_gimage_ic.Contact_Image(dict_ic['id_contact'], grain, image, dict_material))
+                        dict_ic['id_contact'] = dict_ic['id_contact'] + 1
+                        #transmit data
+                        dict_ic['L_contact_gimage'][-1].convert_gimage_in_gg(dict_ic['L_contact'][i_contact_ij])
+                        #update neighborhood
+                        grain.neighbourood_image.append(image)
+
+                        #contact gimage 2
+                        ij_gimage = (ij_gg[1], ij_gg[0])
+                        #contact gimage 1
+                        i_grain = 0
+                        grain = dict_ic['L_g_tempo'][i_grain]
+                        while not grain.id == ij_gimage[0] :
+                            i_grain = i_grain + 1
+                            grain = dict_ic['L_g_tempo'][i_grain]
+                        i_image = 0
+                        image = dict_ic['L_g_image'][i_image]
+                        while not image.id == ij_gimage[1] :
+                            i_image = i_image + 1
+                            image = dict_ic['L_g_image'][i_image]
+                        #creation of contact
+                        dict_ic['L_contact_ij_gimage'].append(ij_gimage)
+                        dict_ic['L_contact_gimage'].append(Create_IC.Contact_gimage_ic.Contact_Image(dict_ic['id_contact'], grain, image, dict_material))
+                        dict_ic['id_contact'] = dict_ic['id_contact'] + 1
+                        #transmit data
+                        dict_ic['L_contact_gimage'][-1].convert_gimage_in_gg(dict_ic['L_contact'][i_contact_ij])
+                        #update neighborhood
+                        grain.neighbourood_image.append(image)
+
+                        L_i_contact_to_delete.append(i_contact_ij)
+                #delete previous contact gimage
+                L_i_contact_to_delete.reverse()
+                for i_contact_to_delete in L_i_contact_to_delete :
+                    dict_ic['L_contact'].pop(i_contact_to_delete)
+                    dict_ic['L_contact_ij'].pop(i_contact_to_delete)
+
+            #right wall
             elif grain.center[0] > dict_sample['x_box_max'] :
                 grain.center = grain.center.copy() + np.array([dict_sample['x_box_min'] - dict_sample['x_box_max'], 0])
                 for i in range(len(grain.l_border)):
                     grain.l_border[i] = grain.l_border[i].copy() + np.array([dict_sample['x_box_min'] - dict_sample['x_box_max'], 0])
                     grain.l_border_x[i] = grain.l_border_x[i].copy() + dict_sample['x_box_min'] - dict_sample['x_box_max']
+                #contact gimage needed to be convert into gg
+                L_i_contact_to_delete = []
+                for ij_gimage in dict_ic['L_contact_ij_gimage'] :
+                    i_contact_gimage = dict_ic['L_contact_ij_gimage'].index(ij_gimage)
+                    if ij_gimage[0] == grain.id or ij_gimage[1] == grain.id:
+                        if ij_gimage[0] > ij_gimage[1] :
+                            ij_gg = (ij_gimage[1], ij_gimage[0])
+                        else :
+                            ij_gg = ij_gimage
+                        grain_i = dict_ic['L_g_tempo'][0]
+                        i_grain = 0
+                        while not grain_i.id == ij_gg[0] :
+                            i_grain = i_grain + 1
+                            grain_i = dict_ic['L_g_tempo'][i_grain]
+                        j_grain = i_grain + 1
+                        grain_j = dict_ic['L_g_tempo'][j_grain]
+                        while not grain_j.id == ij_gg[1] :
+                            j_grain = j_grain + 1
+                            grain_j = dict_ic['L_g_tempo'][j_grain]
+                        if ij_gg not in dict_ic['L_contact_ij'] :
+                            #creation of contact
+                            dict_ic['L_contact_ij'].append(ij_gg)
+                            dict_ic['L_contact'].append(Create_IC.Contact_gg_ic.Contact_Tempo(dict_ic['id_contact'], grain_i, grain_j, dict_material))
+                            dict_ic['id_contact'] = dict_ic['id_contact'] + 1
+                            #transmit data
+                            dict_ic['L_contact'][-1].convert_gimage_in_gg(dict_ic['L_contact_gimage'][i_contact_gimage])
+                            #update neighborhood
+                            grain_i.neighbourood.append(grain_j)
+                        L_i_contact_to_delete.append(i_contact_gimage)
+                #delete previous contact gimage
+                L_i_contact_to_delete.reverse()
+                for i_contact_to_delete in L_i_contact_to_delete :
+                    dict_ic['L_contact_gimage'].pop(i_contact_to_delete)
+                    dict_ic['L_contact_ij_gimage'].pop(i_contact_to_delete)
+                #contact gg needed to be convert into gimage
+                L_i_contact_to_delete = []
+                for ij_gg in dict_ic['L_contact_ij'] :
+                    i_contact_ij = dict_ic['L_contact_ij'].index(ij_gg)
+                    if ij_gg[0] == grain.id or ij_gg[1] == grain.id:
+                        ij_gimage = ij_gg
+                        #contact gimage 1
+                        i_grain = 0
+                        grain = dict_ic['L_g_tempo'][i_grain]
+                        while not grain.id == ij_gimage[0] :
+                            i_grain = i_grain + 1
+                            grain = dict_ic['L_g_tempo'][i_grain]
+                        i_image = 0
+                        image = dict_ic['L_g_image'][i_image]
+                        while not image.id == ij_gimage[1] :
+                            i_image = i_image + 1
+                            image = dict_ic['L_g_image'][i_grain]
+                        #creation of contact
+                        dict_ic['L_contact_ij_gimage'].append(ij_gimage)
+                        dict_ic['L_contact_gimage'].append(Create_IC.Contact_gimage_ic.Contact_Image(dict_ic['id_contact'], grain, image, dict_material))
+                        dict_ic['id_contact'] = dict_ic['id_contact'] + 1
+                        #transmit data
+                        dict_ic['L_contact_gimage'][-1].convert_gimage_in_gg(dict_ic['L_contact'][i_contact_ij])
+                        #update neighborhood
+                        grain.neighbourood_image.append(image)
+
+                        #contact gimage 2
+                        ij_gimage = (ij_gg[1], ij_gg[0])
+                        #contact gimage 1
+                        i_grain = 0
+                        grain = dict_ic['L_g_tempo'][i_grain]
+                        while not grain.id == ij_gimage[0] :
+                            i_grain = i_grain + 1
+                            grain = dict_ic['L_g_tempo'][i_grain]
+                        i_image = 0
+                        image = dict_ic['L_g_image'][i_image]
+                        while not image.id == ij_gimage[1] :
+                            i_image = i_image + 1
+                            image = dict_ic['L_g_image'][i_grain]
+                        #creation of contact
+                        dict_ic['L_contact_ij_gimage'].append(ij_gimage)
+                        dict_ic['L_contact_gimage'].append(Create_IC.Contact_gimage_ic.Contact_Image(dict_ic['id_contact'], grain, image, dict_material))
+                        dict_ic['id_contact'] = dict_ic['id_contact'] + 1
+                        #transmit data
+                        dict_ic['L_contact_gimage'][-1].convert_gimage_in_gg(dict_ic['L_contact'][i_contact_ij])
+                        #update neighborhood
+                        grain.neighbourood_image.append(image)
+
+                        L_i_contact_to_delete.append(i_contact_ij)
+                #delete previous contact gimage
+                L_i_contact_to_delete.reverse()
+                for i_contact_to_delete in L_i_contact_to_delete :
+                    dict_ic['L_contact'].pop(i_contact_to_delete)
+                    dict_ic['L_contact_ij'].pop(i_contact_to_delete)
 
         #check if some grains are outside of the study box
         L_ig_to_delete = []

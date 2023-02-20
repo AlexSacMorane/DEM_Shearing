@@ -51,6 +51,25 @@ class Contact_Image:
 
 #-------------------------------------------------------------------------------
 
+  def convert_gimage_in_gg(self, other):
+    """
+    Convert a contact grain-grain in a contact grain-image.
+
+        Input :
+            itself (a contact_image)
+            a contact grain-grain (a contact_tempo)
+        Output :
+            Nothing, but data from the contact gg are transmitted to the contact gimage
+    """
+    self.ft = other.ft
+    self.tangential_old_statut = other.tangential_old_statut
+    if other.tangential_old_statut :
+        self.tangential_old = other.tangential_old.copy()
+    self.overlap_tangential = other.overlap_tangential
+
+
+#-------------------------------------------------------------------------------
+
   def normal(self):
     """
     Compute the normal reaction of a contact grain-grain.
