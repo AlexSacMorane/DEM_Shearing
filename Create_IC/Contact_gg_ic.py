@@ -232,16 +232,15 @@ def Grains_contact_Neighborhoods(dict_ic,dict_material):
     for i_grain in range(len(dict_ic['L_g_tempo'])-1) :
         grain_i = dict_ic['L_g_tempo'][i_grain]
         for neighbor in dict_ic['L_g_tempo'][i_grain].neighbourood:
-            j_grain = neighbor.id
             grain_j = neighbor
             if Grains_contact_f(grain_i,grain_j):
-                if (i_grain,j_grain) not in dict_ic['L_contact_ij']:  #contact not detected previously
+                if (grain_i.id, grain_j.id) not in dict_ic['L_contact_ij']:  #contact not detected previously
                    #creation of contact
-                   dict_ic['L_contact_ij'].append((i_grain,j_grain))
+                   dict_ic['L_contact_ij'].append((grain_i.id, grain_j.id))
                    dict_ic['L_contact'].append(Contact_Tempo(dict_ic['id_contact'], grain_i, grain_j, dict_material))
                    dict_ic['id_contact'] = dict_ic['id_contact'] + 1
 
             else :
-                if (i_grain,j_grain) in dict_ic['L_contact_ij'] : #contact detected previously is not anymore
-                       dict_ic['L_contact'].pop(dict_ic['L_contact_ij'].index((i_grain,j_grain)))
-                       dict_ic['L_contact_ij'].remove((i_grain,j_grain))
+                if (grain_i.id, grain_j.id) in dict_ic['L_contact_ij'] : #contact detected previously is not anymore
+                       dict_ic['L_contact'].pop(dict_ic['L_contact_ij'].index((grain_i.id, grain_j.id)))
+                       dict_ic['L_contact_ij'].remove((grain_i.id, grain_j.id))

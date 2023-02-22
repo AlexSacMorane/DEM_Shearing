@@ -232,13 +232,13 @@ def Grains_contact_Neighborhoods(dict_ic,dict_material):
             j_grain = neighbor.id
             image = neighbor
             if Grains_contact_f(grain,image):
-                if (i_grain,j_grain) not in dict_ic['L_contact_ij_gimage']:  #contact not detected previously
+                if (grain.id, image.id) not in dict_ic['L_contact_ij_gimage']:  #contact not detected previously
                    #creation of contact
-                   dict_ic['L_contact_ij_gimage'].append((i_grain,j_grain))
+                   dict_ic['L_contact_ij_gimage'].append((grain.id, image.id))
                    dict_ic['L_contact_gimage'].append(Contact_Image(dict_ic['id_contact'], grain, image, dict_material))
                    dict_ic['id_contact'] = dict_ic['id_contact'] + 1
 
             else :
                 if (i_grain,j_grain) in dict_ic['L_contact_ij_gimage'] : #contact detected previously is not anymore
-                       dict_ic['L_contact_gimage'].pop(dict_ic['L_contact_ij_gimage'].index((i_grain,j_grain)))
-                       dict_ic['L_contact_ij_gimage'].remove((i_grain,j_grain))
+                       dict_ic['L_contact_gimage'].pop(dict_ic['L_contact_ij_gimage'].index((grain.id, image.id)))
+                       dict_ic['L_contact_ij_gimage'].remove((grain.id, image.id))
