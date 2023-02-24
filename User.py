@@ -34,7 +34,7 @@ def All_parameters():
     #---------------------------------------------------------------------------
     #Geometric parameters
 
-    N_grain = 100 #total number of grains
+    N_grain = 200 #total number of grains
 
     #Disk
     R_mean = 350 #µm radius to compute the grain distribution. Then recomputed
@@ -91,7 +91,7 @@ def All_parameters():
 
     #Box définition
     x_box_min = 0 #µm
-    x_box_max = 2*Lenght_mean*math.sqrt(N_grain/0.6) #µm 0.6 from Santamarina, 2014 to avoid boundaries effect
+    x_box_max = 2*Lenght_mean*math.sqrt(N_grain) #µm
     y_box_min = 0 #µm
 
     #write dict
@@ -222,7 +222,7 @@ def All_parameters():
     #shear
     U_shear = R_mean / 100
     Shear_velocity = U_shear/dt_DEM_IC
-    Shear_strain_target = 0.1 #total shear displacement / initial sample height
+    Shear_strain_target = 1.5 #total shear displacement / initial sample height
 
     #Add energy to dissolved grain
     Dissolution_Energy = 0.2
