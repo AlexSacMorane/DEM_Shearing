@@ -138,7 +138,29 @@ class Grain_Tempo:
     dw_i = self.mz/self.inertia
     self.w = self.w + dw_i*dt_DEM
     self.theta = self.theta + self.w*dt_DEM
-      
+
+#-------------------------------------------------------------------------------
+
+  def move_as_a_group(self, U, dt_DEM):
+    """
+    Move the grain in a group defined.
+
+        Input :
+            itself (a grain_tempo)
+            a displacement (a 2 x 1 numpy array)
+        Output :
+            Nothing, but the grain is moved
+    """
+    #translation
+    self.v = np.aaray([U[0]/dt_DEM, U[1]/dt_DEM])
+    for i in range(len(self.l_border)):
+        self.l_border[i] = self.l_border[i] + U
+        self.l_border_x[i] = self.l_border_x[i] + U[0]
+        self.l_border_y[i] = self.l_border_y[i] + U[1]
+    self.center = self.center + U
+    #rotation
+    self.w = 0
+
 #-------------------------------------------------------------------------------
 
   def is_group(self, ymin, ymax, name_group):
