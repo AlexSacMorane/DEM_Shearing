@@ -66,6 +66,11 @@ class Contact_Image:
     if other.tangential_old_statut :
         self.tangential_old = other.tangential_old.copy()
     self.overlap_tangential = other.overlap_tangential
+    self.pc_normal = other.pc_normal.copy()
+    self.overlap_normal = other.overlap_normal
+    self.k = other.k
+    self.F_2_1_n = other.F_2_1_n
+    self.pc_tangential = other.pc_tangential.copy()
 
 
 #-------------------------------------------------------------------------------
