@@ -20,6 +20,7 @@ import matplotlib.pyplot as plt
 #Own function and class
 import Create_IC
 import Create_IC_Polygonal
+import Shear
 import Report
 import User
 
@@ -83,3 +84,8 @@ dict_ic['L_contact_gw_ij'] = []
 #-------------------------------------------------------------------------------
 #Shear simulation
 #-------------------------------------------------------------------------------
+
+#change Parameters
+dict_ic['i_print_plot_IC'] = 10
+
+Shear.DEM_vertical_load(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
