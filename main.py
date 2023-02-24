@@ -87,7 +87,9 @@ dict_ic['L_contact_gw_ij'] = []
 
 #change Parameters
 dict_ic['Debug_DEM'] = True
+dict_ic['i_print_plot_IC'] = 50
+dict_ic['i_update_neighborhoods_com'] = 50
 
 simulation_report.write_and_print('Shearing the sample\n', 'Shearing the sample')
 
-Shear.DEM_vertical_load(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
+Shear.DEM_shear_load(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
