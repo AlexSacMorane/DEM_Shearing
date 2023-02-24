@@ -72,6 +72,7 @@ class Grain_Tempo:
     self.fy = 0
     self.v = np.array([0,0])
     self.w = 0
+    self.track_u = False
 
 #-------------------------------------------------------------------------------
 
@@ -133,6 +134,9 @@ class Grain_Tempo:
         self.l_border_x[i] = self.l_border_x[i] + self.v[0]*dt_DEM
         self.l_border_y[i] = self.l_border_y[i] + self.v[1]*dt_DEM
     self.center = self.center + self.v*dt_DEM
+    if self.track_u :
+        self.total_ux = self.total_ux + self.v[0]*dt_DEM
+        self.total_uy = self.total_uy + self.v[1]*dt_DEM
 
     #rotation
     dw_i = self.mz/self.inertia
@@ -158,6 +162,10 @@ class Grain_Tempo:
         self.l_border_x[i] = self.l_border_x[i] + U[0]
         self.l_border_y[i] = self.l_border_y[i] + U[1]
     self.center = self.center + U
+    if self.track_u :
+        self.total_ux = self.total_ux + U[0]
+        self.total_uy = self.total_uy + U[1]
+        
     #rotation
     self.w = 0
 
