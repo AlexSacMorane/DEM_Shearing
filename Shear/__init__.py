@@ -24,9 +24,9 @@ import Create_IC.Contact_gimage_ic
 #Function
 #-------------------------------------------------------------------------------
 
-def DEM_vertical_load(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitation, simulation_report):
+def DEM_shear_load(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitation, simulation_report):
     """
-    Loading the granular system with vertical load.
+    Loading the granular system with vertical load and shear.
 
         Input :
             an initial condition dictionnary (a dict)
@@ -38,7 +38,23 @@ def DEM_vertical_load(dict_algorithm, dict_ic, dict_material, dict_sample, dict_
             Nothing, but initial condition dictionnary is updated
     """
     i_DEM_0 = dict_ic['i_DEM_IC']
+    Shear_strain = 0
+    #compute the sample height
+    min_value = min(dict_ic['L_g_tempo'][0].l_border_y)
+    max_value = max(dict_ic['L_g_tempo'][0].l_border_y)
+    for grain in dict_ic['L_g_tempo']:
+        if min(grain.l_border_y) < min_value :
+            min_value = min(grain.l_border_y)
+        if max(grain.l_border_y) > max_value :
+            max_value = max(grain.l_border_y)
+    Sample_height = max_value - min_value
     DEM_loop_statut = True
+
+    #track total displacement of grains
+    for grain in dict_ic['L_g_tempo'] :
+        grain.track_u = True
+        grain.total_ux = 0
+        grain.total_uy = 0
 
     #Initialisation
     dict_ic['L_contact'] = []
@@ -48,17 +64,6 @@ def DEM_vertical_load(dict_algorithm, dict_ic, dict_material, dict_sample, dict_
     dict_ic['id_contact'] = 0
     dict_ic['L_g_image'] = []
     dict_ic['L_i_image'] = []
-
-    #trackers and stop conditions
-    Force_tracker = []
-    Force_stop = 0
-    Ecin_tracker = []
-    Ecin_stop = 0
-    Ymax_tracker = []
-    Ymax_stop = 0
-    for grain in dict_ic['L_g_tempo']:
-        Force_stop = Force_stop + 0.5*grain.mass*dict_sollicitation['gravity']
-        Ecin_stop = Ecin_stop + 0.5*grain.mass*(dict_ic['Ecin_ratio_IC']*grain.radius/dict_ic['dt_DEM_IC'])**2
 
     while DEM_loop_statut :
 
@@ -128,7 +133,6 @@ def DEM_vertical_load(dict_algorithm, dict_ic, dict_material, dict_sample, dict_
                 Create_IC.convert_gimage_into_gg(grain, dict_ic, dict_material)
                 #contact gg needed to be convert into gimage
                 Create_IC.convert_gg_into_gimage(grain, dict_ic, dict_material)
-
             #right wall
             elif grain.center[0] > dict_sample['x_box_max'] :
                 grain.center = grain.center.copy() + np.array([dict_sample['x_box_min'] - dict_sample['x_box_max'], 0])
@@ -145,34 +149,23 @@ def DEM_vertical_load(dict_algorithm, dict_ic, dict_material, dict_sample, dict_
         dict_sample['y_box_max'] = dict_sample['y_box_max'] + dy_top
         for grain in dict_ic['L_g_tempo'] :
             if grain.group == 'Top':
-                grain.move_as_a_group(np.array([0, dy_top]), dict_ic['dt_DEM_IC'])
-
-        #Tracker
-        F = F_total(dict_ic['L_g_tempo'])
-        Ecin = E_cin_total(dict_ic['L_g_tempo'])
-        Force_tracker.append(F)
-        Ecin_tracker.append(Ecin)
-        Ymax_tracker.append(dict_sample['y_box_max'])
+                grain.move_as_a_group(np.array([dict_sollicitation['Shear_velocity']*dict_ic['dt_DEM_IC'], dy_top]), dict_ic['dt_DEM_IC'])
+        #Update shear strain
+        Shear_strain = Shear_strain + dict_sollicitation['Shear_velocity']*dict_ic['dt_DEM_IC'] / Sample_height
 
         if dict_ic['i_DEM_IC'] % dict_ic['i_print_plot_IC'] ==0:
-            if dict_sollicitation['gravity'] > 0 :
-                print('i_DEM',dict_ic['i_DEM_IC'],'and Ecin',int(100*Ecin/Ecin_stop),'% and Force',int(100*F/Force_stop),'% and Confinement',int(100*Fv/dict_sollicitation['Vertical_Confinement_Force']),'%')
-            else :
-                print('i_DEM',dict_ic['i_DEM_IC'],'and Ecin',int(100*Ecin/Ecin_stop),'% and Confinement',int(100*Fv/dict_sollicitation['Vertical_Confinement_Force']),'%')
+            print('i_DEM',dict_ic['i_DEM_IC'],'and Confinement',int(100*Fv/dict_sollicitation['Vertical_Confinement_Force']),'% and Shear',int(100*Shear_strain/dict_sollicitation['Shear_strain_target']),'%')
             if dict_ic['Debug_DEM'] :
                 Plot_Config_Loaded(dict_ic,dict_ic['i_DEM_IC'])
 
         #Check stop conditions for DEM
-        if dict_ic['i_DEM_IC'] >= dict_ic['i_DEM_stop_IC'] + i_DEM_0:
+        if Shear_strain >= dict_sollicitation['Shear_strain_target'] :
              DEM_loop_statut = False
-        if dict_sollicitation['gravity'] > 0:
-            if Ecin < Ecin_stop and F < Force_stop and (0.95*dict_sollicitation['Vertical_Confinement_Force']<Fv and Fv<1.05*dict_sollicitation['Vertical_Confinement_Force']):
-                  DEM_loop_statut = False
-        else:
-            if Ecin < Ecin_stop and dict_ic['i_DEM_IC'] >= dict_ic['i_DEM_stop_IC']*0.1 + i_DEM_0 and (0.95*dict_sollicitation['Vertical_Confinement_Force']<Fv and Fv<1.05*dict_sollicitation['Vertical_Confinement_Force']):
-                DEM_loop_statut = False
         if dict_ic['L_g_tempo'] == []:
             DEM_loop_statut = False
+
+    #plot total displacement field
+    Plot_total_U(dict_ic)
 
 #-------------------------------------------------------------------------------
 
@@ -333,7 +326,6 @@ def Plot_Config_Loaded(dict_ic,i):
 
         Input :
             a list of temporary grain (a list)
-            the coordinates of the walls (four floats)
             an iteration (a int)
         Output :
             Nothing, but a .png file is generated (a file)
@@ -354,3 +346,32 @@ def Plot_Config_Loaded(dict_ic,i):
     plt.close(1)
 
 #-------------------------------------------------------------------------------
+
+def Plot_total_U(dict_ic):
+    """
+    Plot the map of the total displacement tracked.
+
+        Input :
+            a list of temporary grain (a list)
+        Output :
+            Nothing, but a .png file is generated (a file)
+    """
+    L_color_group = ['k','r','b']
+    L_group = ['Current', 'Bottom', 'Top']
+    plt.figure(1,figsize=(16,9))
+    x_L = []
+    y_L = []
+    u_L = []
+    v_L = []
+    for grain in dict_ic['L_g_tempo']:
+        for i_group in range(len(L_group)):
+            if grain.group == L_group[i_group] :
+                plt.plot(grain.l_border_x,grain.l_border_y,L_color_group[i_group])
+                x_L.append(grain.center[0])
+                y_L.append(grain.center[1])
+                u_L.append(grain.total_ux)
+                v_L.append(grain.total_uy)
+    plt.quiver(x_L,y_L,u_L,v_L)
+    plt.axis('equal')
+    plt.savefig('Debug/Configuration/Total_U_Sheared.png')
+    plt.close(1)
