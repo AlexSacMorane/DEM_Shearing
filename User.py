@@ -212,9 +212,17 @@ def All_parameters():
     #---------------------------------------------------------------------------
     #External sollicitations
 
+    #gravity
+    gravity = 0 #µm/s2
+
+    #Confinement load
     Vertical_Confinement_Linear_Force = Y*2*R_mean/1000 #µN/µm used to compute the Vertical_Confinement_Force
     Vertical_Confinement_Force = Vertical_Confinement_Linear_Force*(x_box_max-x_box_min) #µN
-    gravity = 0 #µm/s2
+
+    #shear
+    U_shear = R_mean / 100
+    Shear_velocity = U_shear/dt_DEM_IC
+    Shear_strain_target = 0.1 #total shear displacement / initial sample height
 
     #Add energy to dissolved grain
     Dissolution_Energy = 0.2
@@ -223,7 +231,9 @@ def All_parameters():
     dict_sollicitations = {
     'Dissolution_Energy' : Dissolution_Energy,
     'Vertical_Confinement_Force' : Vertical_Confinement_Force,
-    'gravity' : gravity
+    'gravity' : gravity,
+    'Shear_velocity' : Shear_velocity,
+    'Shear_strain_target' : Shear_strain_target
     }
 
     #---------------------------------------------------------------------------
