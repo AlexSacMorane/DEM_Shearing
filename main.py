@@ -63,7 +63,7 @@ for grain in dict_ic['L_g_tempo'] :
         i_bottom = i_bottom + 1
     elif grain.is_group(dict_sample['y_box_max']-2*dict_geometry['R_mean'], dict_sample['y_box_max'], 'Top') :
         i_top = i_top + 1
-simulation_report.write_and_print(str(i_bottom)+' grains in Bottom group\n'+str(i_top)+' grains in Top group\n', str(i_bottom)+' grains in Bottom group\n'+str(i_top)+' grains in Top group')
+simulation_report.write_and_print(str(i_bottom)+' grains in Bottom group\n'+str(i_top)+' grains in Top group\n\n', str(i_bottom)+' grains in Bottom group\n'+str(i_top)+' grains in Top group\n')
 
 #plot group distribution
 L_color_group = ['k','r','b']
@@ -86,6 +86,8 @@ dict_ic['L_contact_gw_ij'] = []
 #-------------------------------------------------------------------------------
 
 #change Parameters
-dict_ic['i_print_plot_IC'] = 10
+dict_ic['Debug_DEM'] = True
+
+simulation_report.write_and_print('Shearing the sample\n', 'Shearing the sample')
 
 Shear.DEM_vertical_load(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
