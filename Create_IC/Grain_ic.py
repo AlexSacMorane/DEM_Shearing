@@ -152,7 +152,7 @@ class Grain_Tempo:
             Nothing, but the grain is moved
     """
     #translation
-    self.v = np.aaray([U[0]/dt_DEM, U[1]/dt_DEM])
+    self.v = np.array([U[0]/dt_DEM, U[1]/dt_DEM])
     for i in range(len(self.l_border)):
         self.l_border[i] = self.l_border[i] + U
         self.l_border_x[i] = self.l_border_x[i] + U[0]

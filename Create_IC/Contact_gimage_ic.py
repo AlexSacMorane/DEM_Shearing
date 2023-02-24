@@ -99,6 +99,7 @@ class Contact_Image:
         Y_eq = 1/((1-self.g1.nu*self.g1.nu)/self.g1.y+(1-self.g2.nu*self.g2.nu)/self.g2.y)
         R_eq = 1/(1/self.g1.radius+1/self.g2.radius)
         k = 4/3*Y_eq*math.sqrt(R_eq)
+        self.k = k
         F_2_1_n = -k * overlap**(3/2)  #unlinear spring
         F_2_1 = F_2_1_n * PC_normal
         self.F_2_1_n = F_2_1_n

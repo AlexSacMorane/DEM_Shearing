@@ -141,7 +141,7 @@ def DEM_vertical_load(dict_algorithm, dict_ic, dict_material, dict_sample, dict_
                 Create_IC.convert_gg_into_gimage(grain, dict_ic, dict_material)
 
         #Control the top group to have the pressure target
-        dy_top, Fv = Control_Top_NR(dict_sollicitation['Vertical_Confinement_Force'],dict_ic['L_contact_gg']+dict_ic['L_contact_gimage'],dict_ic['L_g_tempo'])
+        dy_top, Fv = Control_Top_NR(dict_sollicitation['Vertical_Confinement_Force'],dict_ic['L_contact']+dict_ic['L_contact_gimage'],dict_ic['L_g_tempo'])
         dict_sample['y_box_max'] = dict_sample['y_box_max'] + dy_top
         for grain in dict_ic['L_g_tempo'] :
             if grain.group == 'Top':
@@ -173,9 +173,6 @@ def DEM_vertical_load(dict_algorithm, dict_ic, dict_material, dict_sample, dict_
                 DEM_loop_statut = False
         if dict_ic['L_g_tempo'] == []:
             DEM_loop_statut = False
-
-    #Update dict
-    dict_ic['L_L_g_tempo'].append(dict_ic['L_g_tempo'].copy())
 
 #-------------------------------------------------------------------------------
 
@@ -231,11 +228,11 @@ def Control_Top_NR(Force_target,L_contact_gg,L_g):
         #compute force applied, save contact overlap and spring
         if (contact.g1.group == 'Current' and contact.g2.group == 'Top') :
             F = F - contact.F_2_1_n * contact.pc_normal[1] #- because F_2_1_n < 0
-            overlap_L.append(contact.overlap)
+            overlap_L.append(contact.overlap_normal)
             k_L.append(contact.k*contact.pc_normal[1])
         elif (contact.g1.group == 'Top' and contact.g2.group == 'Current') :
             F = F + contact.F_2_1_n * contact.pc_normal[1] #+ because F_2_1_n < 0 and pc_normal from top to current
-            overlap_L.append(contact.overlap)
+            overlap_L.append(contact.overlap_normal)
             k_L.append(-contact.k*contact.pc_normal[1]) #because pc_normal from top to current
 
     if overlap_L != []:
