@@ -34,7 +34,7 @@ def All_parameters():
     #---------------------------------------------------------------------------
     #Geometric parameters
 
-    N_grain = 300 #total number of grains
+    N_grain = 100 #total number of grains
 
     #Disk
     R_mean = 350 #µm radius to compute the grain distribution. Then recomputed
