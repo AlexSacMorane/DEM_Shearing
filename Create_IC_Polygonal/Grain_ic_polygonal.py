@@ -51,6 +51,8 @@ class Grain_Tempo_Polygonal:
     L_border_x.append(L_border_x[0])
     L_border_y.append(L_border_y[0])
     #save
+    self.group = 'Current'
+    self.image = None
     self.radius = grain_sphere.radius
     self.r_min = grain_sphere.radius
     self.r_max = grain_sphere.radius
@@ -73,6 +75,7 @@ class Grain_Tempo_Polygonal:
     self.fy = 0
     self.v = np.array([0,0])
     self.w = 0
+    self.track_u = False
 
 #-------------------------------------------------------------------------------
 
@@ -157,3 +160,118 @@ class Grain_Tempo_Polygonal:
         self.l_border[i] = p + self.center
         self.l_border_x[i] = p[0] + self.center[0]
         self.l_border_y[i] = p[1] + self.center[1]
+
+#-------------------------------------------------------------------------------
+
+  def move_as_a_group(self, U, dt_DEM):
+    """
+    Move the grain in a group defined.
+
+        Input :
+            itself (a grain_tempo)
+            a displacement (a 2 x 1 numpy array)
+        Output :
+            Nothing, but the grain is moved
+    """
+    #translation
+    self.v = np.array([U[0]/dt_DEM, U[1]/dt_DEM])
+    for i in range(len(self.l_border)):
+        self.l_border[i] = self.l_border[i] + U
+        self.l_border_x[i] = self.l_border_x[i] + U[0]
+        self.l_border_y[i] = self.l_border_y[i] + U[1]
+    self.center = self.center + U
+    if self.track_u :
+        self.total_ux = self.total_ux + U[0]
+        self.total_uy = self.total_uy + U[1]
+
+    #rotation
+    self.w = 0
+
+#-------------------------------------------------------------------------------
+
+  def is_group(self, ymin, ymax, name_group):
+      """
+      Check if a grain is in a determined group by comparing center y-coordinate with two limits.
+
+        Input :
+            itself (a grain_tempo)
+            two y limits (two floats)
+            a name (a string)
+        Output :
+            a Boolean and the attribut group is updated (a string)
+
+      """
+      if ymin <= self.center[1] and self.center[1] <= ymax:
+          self.group = name_group
+          return True
+      else :
+          return False
+
+#-------------------------------------------------------------------------------
+
+class Grain_Image_Polygonal(Grain_Tempo_Polygonal):
+  """
+  An image grain used to generated an initial condition.
+  """
+
+#-------------------------------------------------------------------------------
+
+  def __init__(self, real_grain, position):
+    """Defining the image of a real grain.
+
+        Input :
+            itself (a grain_image)
+            a real grain (a grain_tempo)
+        Output :
+            Nothing, but an image grain is generated (a grain_image)
+    """
+    real_grain.image = self
+    self.real = real_grain
+    self.position = position
+    self.group = real_grain.group
+    self.radius = real_grain.radius
+    self.r_min = grain_sphere.radius
+    self.r_max = grain_sphere.radius
+    self.theta = real_grain.theta
+    self.rho_surf = real_grain.rho_surf
+    self.surface = real_grain.surface
+    self.mass = real_grain.mass
+    self.inertia = real_grain.inertia
+    self.id = real_grain.id
+    self.center = np.array(grain_sphere.center.copy())
+    self.l_border = L_border.copy()
+    self.l_border_x = L_border_x.copy()
+    self.l_border_y = L_border_y.copy()
+    self.l_r = L_r.copy()
+    self.l_theta_r = L_theta_r.copy()
+    self.y = real_grain.y
+    self.nu = real_grain.nu
+    self.g = real_grain.g
+    self.fx = real_grain.fx
+    self.fy = real_grain.fy
+    self.v = real_grain.v.copy()
+    self.w = real_grain.w
+
+#-------------------------------------------------------------------------------
+
+  def translation(self, U):
+    """Translate an image grain depending on the tempo grain.
+
+        Input :
+            itself (a grain_image)
+            a real grain (a grain_tempo)
+        Output :
+            Nothing, but an image grain is generated (a grain_image)
+    """
+    self.center = self.real.center.copy() + U
+    self.l_border = []
+    self.l_border_x = []
+    self.l_border_y = []
+    for i in range(len(self.real.l_border)):
+        self.l_border.append(self.real.l_border[i].copy() + U)
+        self.l_border_x.append(self.real.l_border[i][0].copy() + U[0])
+        self.l_border_y.append(self.real.l_border[i][1].copy() + U[1])
+    #update data
+    self.v = self.real.v.copy()
+    self.w = self.real.w
+    self.theta = self.real.theta
