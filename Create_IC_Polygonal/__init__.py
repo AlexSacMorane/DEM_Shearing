@@ -72,6 +72,7 @@ def DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollic
     dict_ic['L_contact_gw'] = []
     dict_ic['L_contact_gw_ij'] = []
     dict_ic['id_contact'] = 0
+    #create dict_ic['L_contact_ij_gimage'], dict_ic['L_contact_gimage'], dict_ic['L_g_image'], dict_ic['L_i_image']
 
     #trackers and stop conditions
     Force_tracker = []
@@ -79,7 +80,6 @@ def DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollic
     Ecin_tracker = []
     Ecin_stop = 0
     Ymax_tracker = []
-    k0_tracker = []
     Fv_tracker = []
     for grain in dict_ic['L_g_tempo']:
         Force_stop = Force_stop + 0.5*grain.mass*dict_sollicitation['gravity']
@@ -90,10 +90,15 @@ def DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollic
 
         dict_ic['i_DEM_IC'] = dict_ic['i_DEM_IC'] + 1
 
+        #create image
+        #translate image
+
         #Contact detection
         if (dict_ic['i_DEM_IC']-i_DEM_0-1) % i_update_neighborhoods  == 0:
             Update_Neighborhoods(dict_ic)
+            #neighborhood gimage
         Grains_contact_Neighborhoods(dict_ic,dict_material)
+        #contact gimage
 
         # Detection of contacts between grain and walls
         if (dict_ic['i_DEM_IC']-i_DEM_0-1) % i_update_neighborhoods  == 0:
@@ -110,6 +115,8 @@ def DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollic
         #Move grains
         for grain in dict_ic['L_g_tempo']:
             grain.euler_semi_implicite(dict_ic['dt_DEM_IC'],10*dict_ic['Ecin_ratio_IC'])
+
+        #periodic condition
 
         #check if some grains are outside of the study box
         L_ig_to_delete = []
@@ -137,19 +144,6 @@ def DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollic
         Ecin_tracker.append(Ecin)
         Ymax_tracker.append(dict_sample['y_box_max'])
         Fv_tracker.append(Fv)
-        F_xmin = 0
-        F_xmax = 0
-        for contact in dict_ic['L_contact_gw']:
-            if contact.nature == 'gwx_min' :
-                F_xmin = F_xmin + contact.Fwg_n
-            if contact.nature == 'gwx_max' :
-                F_xmax = F_xmax + contact.Fwg_n
-        if Fv != 0:
-            k0 = np.mean([F_xmin/(dict_sample['y_box_max'] - dict_sample['y_box_min'])*(dict_sample['x_box_max'] - dict_sample['x_box_min'])/Fv,
-                          F_xmax/(dict_sample['y_box_max'] - dict_sample['y_box_min'])*(dict_sample['x_box_max'] - dict_sample['x_box_min'])/Fv])
-        else :
-            k0 = 0
-        k0_tracker.append(k0)
 
         if dict_ic['i_DEM_IC'] % dict_ic['i_print_plot_IC'] ==0:
             if dict_sollicitation['gravity'] > 0 :
@@ -174,7 +168,6 @@ def DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollic
     #update dict
     dict_ic['Ecin_tracker'] = Ecin_tracker
     dict_ic['Ymax_tracker'] = Ymax_tracker
-    dict_ic['k0_tracker'] = k0_tracker
     dict_ic['Fv_tracker'] = Fv_tracker
 
 #-------------------------------------------------------------------------------
@@ -358,36 +351,6 @@ def Plot_Config_Loaded(L_g,x_min,x_max,y_min,y_max,i):
     plt.plot([x_min,x_min,x_max,x_max,x_min],[y_max,y_min,y_min,y_max,y_max],'k')
     plt.axis('equal')
     plt.savefig('Debug/Configuration/Init/Config_Loaded_'+str(i)+'.png')
-    plt.close(1)
-
-#-------------------------------------------------------------------------------
-
-def Plot_Config_Loaded_End(L_g,x_min,x_max,y_min,y_max):
-    """
-    Plot loaded configuration at the end of the initial configuration.
-
-        Input :
-            a list of temporary grain (a list)
-            the coordinates of the walls (four floats)
-            an iteration (a int)
-        Output :
-            Nothing, but a .png file is generated (a file)
-    """
-    plt.figure(1,figsize=(16,9))
-    L_x = []
-    L_y = []
-    L_u = []
-    L_v = []
-    for grain in L_g:
-        plt.plot(grain.l_border_x,grain.l_border_y,'k')
-        plt.plot(grain.center[0],grain.center[1],'xk')
-        L_x.append(grain.center[0])
-        L_y.append(grain.center[1])
-        L_u.append(grain.fx)
-        L_v.append(grain.fy)
-    plt.plot([x_min,x_min,x_max,x_max,x_min],[y_max,y_min,y_min,y_max,y_max],'k')
-    plt.axis('equal')
-    plt.savefig('Debug/ConfigLoaded.png')
     plt.close(1)
 
 #-------------------------------------------------------------------------------
