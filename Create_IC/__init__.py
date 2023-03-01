@@ -196,7 +196,6 @@ def DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollic
                     for i_toremove in L_i_toremove:
                         dict_ic['L_contact_gimage'].pop(i_toremove)
                         dict_ic['L_contact_ij_gimage'].pop(i_toremove)
-
         #translate image
         for image in dict_ic['L_g_image']:
             if image.position == 'left' :
