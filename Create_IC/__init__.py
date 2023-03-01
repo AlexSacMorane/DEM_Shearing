@@ -188,6 +188,15 @@ def DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollic
                     i_toremove = dict_ic['L_i_image'].index(grain.id)
                     dict_ic['L_g_image'].pop(i_toremove)
                     dict_ic['L_i_image'].pop(i_toremove)
+                    L_i_toremove = []
+                    for ij_gimage in dict_ic['L_contact_ij_gimage'] :
+                        if grain.id == ij_gimage[1] :
+                            L_i_toremove.append(dict_ic['L_contact_ij_gimage'].index(ij_gimage))
+                    L_i_toremove.reverse()
+                    for i_toremove in L_i_toremove:
+                        dict_ic['L_contact_gimage'].pop(i_toremove)
+                        dict_ic['L_contact_ij_gimage'].pop(i_toremove)
+
         #translate image
         for image in dict_ic['L_g_image']:
             if image.position == 'left' :
