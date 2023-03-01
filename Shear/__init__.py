@@ -219,6 +219,7 @@ def Control_Top_NR(Force_target,L_contact_gg,L_g):
     k_L = []
     for contact in L_contact_gg:
         #compute force applied, save contact overlap and spring
+        #only the normal component is considered, no tangential one, no damping
         if (contact.g1.group == 'Current' and contact.g2.group == 'Top') :
             F = F - contact.F_2_1_n * contact.pc_normal[1] #- because F_2_1_n < 0
             overlap_L.append(contact.overlap_normal)
@@ -245,8 +246,7 @@ def Control_Top_NR(Force_target,L_contact_gg,L_g):
 
     else :
         #if there is no contact with the upper wall, the wall is reset
-        raise ValueError('Not available for the moment')
-        y_max = Reset_y_max(L_g,Force_target)
+        dy_top = Reset_y_max(L_g)
 
     return dy_top, F
 
@@ -289,34 +289,25 @@ def error_on_ymax_df(dy,overlap_L,k_L) :
 
 #-------------------------------------------------------------------------------
 
-def Reset_y_max(L_g,Force):
+def Reset_y_max(L_g):
     """
-    The Top group is located as a single contact verify the target value.
+    The Top group is going down by a fraction of the mean radius.
 
+    The confinement force is not verified.
+    
         Input :
             the list of temporary grains (a list)
-            the confinement force (a float)
         Output :
             the upper wall position (a float)
     """
-    y_max = None
-    id_grain_max = None
-    for id_grain in range(len(L_g)):
-        grain = L_g[id_grain]
-        y_max_grain = grain.center[1] + grain.radius
-
-        if y_max != None and y_max_grain > y_max:
-            y_max = y_max_grain
-            id_grain_max = id_grain
-        elif y_max == None:
-            y_max = y_max_grain
-            id_grain_max = id_grain
-
-    factor = 5
-    k = factor*4/3*L_g[id_grain_max].y/(1-L_g[id_grain_max].nu*L_g[id_grain_max].nu)*math.sqrt(L_g[id_grain_max].radius)
-    y_max = y_max - (Force/k)**(2/3)
-
-    return y_max
+    R_mean = 0
+    n_grain = 0
+    for grain in L_g :
+        if grain.group == 'Top' :
+            R_mean = R_mean + grain.radius
+            n_grain = n_grain + 1
+    dy_top = - R_mean / n_grain / 20
+    return dy_top
 
 #-------------------------------------------------------------------------------
 
@@ -367,10 +358,11 @@ def Plot_total_U(dict_ic):
         for i_group in range(len(L_group)):
             if grain.group == L_group[i_group] :
                 plt.plot(grain.l_border_x,grain.l_border_y,L_color_group[i_group])
-                x_L.append(grain.center[0])
-                y_L.append(grain.center[1])
-                u_L.append(grain.total_ux)
-                v_L.append(grain.total_uy)
+        if grain.group == 'Current' :
+            x_L.append(grain.center[0])
+            y_L.append(grain.center[1])
+            u_L.append(grain.total_ux)
+            v_L.append(grain.total_uy)
     plt.quiver(x_L,y_L,u_L,v_L)
     plt.axis('equal')
     plt.savefig('Debug/Configuration/Total_U_Sheared.png')
