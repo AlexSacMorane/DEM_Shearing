@@ -154,7 +154,6 @@ def DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollic
     Ecin_tracker = []
     Ecin_stop = 0
     Ymax_tracker = []
-    Ymax_stop = 0
     for grain in dict_ic['L_g_tempo']:
         Force_stop = Force_stop + 0.5*grain.mass*dict_sollicitation['gravity']
         Ecin_stop = Ecin_stop + 0.5*grain.mass*(dict_ic['Ecin_ratio_IC']*grain.radius/dict_ic['dt_DEM_IC'])**2
@@ -630,32 +629,6 @@ def Plot_Config_Loaded(dict_ic,x_min,x_max,y_min,y_max,i):
     plt.plot([x_min,x_max],[y_max,y_max],'k')
     plt.axis('equal')
     plt.savefig('Debug/Configuration/Init/Config_Loaded_'+str(i)+'.png')
-    plt.close(1)
-
-#-------------------------------------------------------------------------------
-
-def Plot_Config_Loaded_End(dict_ic,x_min,x_max,y_min,y_max):
-    """
-    Plot loaded configuration at the end of the initial configuration.
-
-        Input :
-            a list of temporary grain (a list)
-            the coordinates of the walls (four floats)
-            an iteration (a int)
-        Output :
-            Nothing, but a .png file is generated (a file)
-    """
-    plt.figure(1,figsize=(16,9))
-    for grain in dict_ic['L_g_tempo']:
-        plt.plot(grain.l_border_x,grain.l_border_y,'k')
-        plt.plot(grain.center[0],grain.center[1],'xk')
-    for grain in dict_ic['L_g_image']:
-        plt.plot(grain.l_border_x,grain.l_border_y,'-.k')
-        plt.plot(grain.center[0],grain.center[1],'xk')
-    plt.plot([x_min,x_max],[y_min,y_min],'k')
-    plt.plot([x_min,x_max],[y_max,y_max],'k')
-    plt.axis('equal')
-    plt.savefig('Debug/ConfigLoaded.png')
     plt.close(1)
 
 #-------------------------------------------------------------------------------
