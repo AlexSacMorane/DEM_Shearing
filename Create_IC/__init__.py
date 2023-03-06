@@ -3,7 +3,7 @@
 @author: Alexandre Sac--Morane
 alexandre.sac-morane@uclouvain.be
 
-This file contains ??.nt functions used in the simulation.
+This file contains functions used in the simulation.
 """
 
 #-------------------------------------------------------------------------------
@@ -238,7 +238,6 @@ def DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollic
                 convert_gimage_into_gg(grain, dict_ic, dict_material)
                 #contact gg needed to be convert into gimage
                 convert_gg_into_gimage(grain, dict_ic, dict_material)
-
             #right wall
             elif grain.center[0] > dict_sample['x_box_max'] :
                 grain.center = grain.center.copy() + np.array([dict_sample['x_box_min'] - dict_sample['x_box_max'], 0])
@@ -422,9 +421,6 @@ def convert_gg_into_gimage(grain, dict_ic, dict_material):
                 image = dict_ic['L_g_image'][i_image]
                 while not image.id == ij_gimage[1] :
                     i_image = i_image + 1
-                    if i_image == len(dict_ic['L_g_image']):
-                        print('Bug', ij_gimage, i_grain, image.id)
-                        print(dict_ic['L_i_image'])
                     image = dict_ic['L_g_image'][i_image]
                 #creation of contact
                 dict_ic['L_contact_ij_gimage'].append(ij_gimage)
@@ -448,9 +444,6 @@ def convert_gg_into_gimage(grain, dict_ic, dict_material):
                 image = dict_ic['L_g_image'][i_image]
                 while not image.id == ij_gimage[1] :
                     i_image = i_image + 1
-                    if i_image == len(dict_ic['L_g_image']):
-                        print('Bug', ij_gimage, i_grain, image.id)
-                        print(dict_ic['L_i_image'])
                     image = dict_ic['L_g_image'][i_image]
                 #creation of contact
                 dict_ic['L_contact_ij_gimage'].append(ij_gimage)
