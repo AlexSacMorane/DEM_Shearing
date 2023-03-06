@@ -411,47 +411,55 @@ def convert_gg_into_gimage(grain, dict_ic, dict_material):
         i_contact_ij = dict_ic['L_contact_ij'].index(ij_gg)
         if ij_gg[0] == grain.id or ij_gg[1] == grain.id:
             ij_gimage = ij_gg
-            #contact gimage 1
-            i_grain = 0
-            grain = dict_ic['L_g_tempo'][i_grain]
-            while not grain.id == ij_gimage[0] :
-                i_grain = i_grain + 1
+            if ij_gimage[1] in dict_ic['L_i_image'] :
+                #contact gimage 1
+                i_grain = 0
                 grain = dict_ic['L_g_tempo'][i_grain]
-            i_image = 0
-            image = dict_ic['L_g_image'][i_image]
-            while not image.id == ij_gimage[1] :
-                i_image = i_image + 1
+                while not grain.id == ij_gimage[0] :
+                    i_grain = i_grain + 1
+                    grain = dict_ic['L_g_tempo'][i_grain]
+                i_image = 0
                 image = dict_ic['L_g_image'][i_image]
-            #creation of contact
-            dict_ic['L_contact_ij_gimage'].append(ij_gimage)
-            dict_ic['L_contact_gimage'].append(Create_IC.Contact_gimage_ic.Contact_Image(dict_ic['id_contact'], grain, image, dict_material))
-            dict_ic['id_contact'] = dict_ic['id_contact'] + 1
-            #transmit data
-            dict_ic['L_contact_gimage'][-1].convert_gimage_in_gg(dict_ic['L_contact'][i_contact_ij])
-            #update neighborhood
-            grain.neighbourood_image.append(image)
+                while not image.id == ij_gimage[1] :
+                    i_image = i_image + 1
+                    if i_image == len(dict_ic['L_g_image']):
+                        print('Bug', ij_gimage, i_grain, image.id)
+                        print(dict_ic['L_i_image'])
+                    image = dict_ic['L_g_image'][i_image]
+                #creation of contact
+                dict_ic['L_contact_ij_gimage'].append(ij_gimage)
+                dict_ic['L_contact_gimage'].append(Create_IC.Contact_gimage_ic.Contact_Image(dict_ic['id_contact'], grain, image, dict_material))
+                dict_ic['id_contact'] = dict_ic['id_contact'] + 1
+                #transmit data
+                dict_ic['L_contact_gimage'][-1].convert_gimage_in_gg(dict_ic['L_contact'][i_contact_ij])
+                #update neighborhood
+                grain.neighbourood_image.append(image)
 
             #contact gimage 2
             ij_gimage = (ij_gg[1], ij_gg[0])
-            #contact gimage 1
-            i_grain = 0
-            grain = dict_ic['L_g_tempo'][i_grain]
-            while not grain.id == ij_gimage[0] :
-                i_grain = i_grain + 1
+            if ij_gimage[1] in dict_ic['L_i_image'] :
+                #contact gimage 1
+                i_grain = 0
                 grain = dict_ic['L_g_tempo'][i_grain]
-            i_image = 0
-            image = dict_ic['L_g_image'][i_image]
-            while not image.id == ij_gimage[1] :
-                i_image = i_image + 1
+                while not grain.id == ij_gimage[0] :
+                    i_grain = i_grain + 1
+                    grain = dict_ic['L_g_tempo'][i_grain]
+                i_image = 0
                 image = dict_ic['L_g_image'][i_image]
-            #creation of contact
-            dict_ic['L_contact_ij_gimage'].append(ij_gimage)
-            dict_ic['L_contact_gimage'].append(Create_IC.Contact_gimage_ic.Contact_Image(dict_ic['id_contact'], grain, image, dict_material))
-            dict_ic['id_contact'] = dict_ic['id_contact'] + 1
-            #transmit data
-            dict_ic['L_contact_gimage'][-1].convert_gimage_in_gg(dict_ic['L_contact'][i_contact_ij])
-            #update neighborhood
-            grain.neighbourood_image.append(image)
+                while not image.id == ij_gimage[1] :
+                    i_image = i_image + 1
+                    if i_image == len(dict_ic['L_g_image']):
+                        print('Bug', ij_gimage, i_grain, image.id)
+                        print(dict_ic['L_i_image'])
+                    image = dict_ic['L_g_image'][i_image]
+                #creation of contact
+                dict_ic['L_contact_ij_gimage'].append(ij_gimage)
+                dict_ic['L_contact_gimage'].append(Create_IC.Contact_gimage_ic.Contact_Image(dict_ic['id_contact'], grain, image, dict_material))
+                dict_ic['id_contact'] = dict_ic['id_contact'] + 1
+                #transmit data
+                dict_ic['L_contact_gimage'][-1].convert_gimage_in_gg(dict_ic['L_contact'][i_contact_ij])
+                #update neighborhood
+                grain.neighbourood_image.append(image)
 
             L_i_contact_to_delete.append(i_contact_ij)
     #delete previous contact gimage
