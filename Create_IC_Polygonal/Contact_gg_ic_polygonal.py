@@ -50,6 +50,29 @@ class Contact_Tempo_Polygonal:
 
 #-------------------------------------------------------------------------------
 
+  def convert_gimage_in_gg(self, other):
+    """
+    Convert a contact grain-image in a contact grain-grain.
+
+        Input :
+            itself (a contact_tempo)
+            a contact grain-image (a contact_gimage)
+        Output :
+            Nothing, but data from the contact gimage are transmitted to the contact gg
+    """
+    self.ft = other.ft
+    self.tangential_old_statut = other.tangential_old_statut
+    if other.tangential_old_statut :
+        self.tangential_old = other.tangential_old.copy()
+    self.overlap_tangential = other.overlap_tangential
+    self.pc_normal = other.pc_normal.copy()
+    self.overlap_normal = other.overlap_normal
+    self.k = other.k
+    self.F_2_1_n = other.F_2_1_n
+    self.pc_tangential = other.pc_tangential.copy()
+
+#-------------------------------------------------------------------------------
+
   def normal(self):
     """
     Compute the normal reaction of a contact grain-grain.
