@@ -269,8 +269,8 @@ class Grain_Image_Polygonal(Grain_Tempo_Polygonal):
     self.l_border_y = []
     for i in range(len(self.real.l_border)):
         self.l_border.append(self.real.l_border[i].copy() + U)
-        self.l_border_x.append(self.real.l_border[i][0].copy() + U[0])
-        self.l_border_y.append(self.real.l_border[i][1].copy() + U[1])
+        self.l_border_x.append(self.real.l_border[i][0] + U[0])
+        self.l_border_y.append(self.real.l_border[i][1] + U[1])
     #update data
     self.v = self.real.v.copy()
     self.w = self.real.w
