@@ -3,7 +3,7 @@
 @author: Alexandre Sac--Morane
 alexandre.sac-morane@uclouvain.be
 
-This file contains ??.nt functions used in the simulation.
+This file contains functions used in the simulation.
 """
 
 #-------------------------------------------------------------------------------
@@ -48,14 +48,12 @@ def DEM_shear_load(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sol
         if max(grain.l_border_y) > max_value :
             max_value = max(grain.l_border_y)
     Sample_height = max_value - min_value
-    DEM_loop_statut = True
-
     #track total displacement of grains
     for grain in dict_ic['L_g_tempo'] :
         grain.track_u = True
         grain.total_ux = 0
         grain.total_uy = 0
-
+    DEM_loop_statut = True
     #Initialisation
     dict_ic['L_contact'] = []
     dict_ic['L_contact_ij'] = []
@@ -103,7 +101,6 @@ def DEM_shear_load(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sol
                     for i_toremove in L_i_toremove:
                         dict_ic['L_contact_gimage'].pop(i_toremove)
                         dict_ic['L_contact_ij_gimage'].pop(i_toremove)
-
         #translate image
         for image in dict_ic['L_g_image']:
             if image.position == 'left' :
