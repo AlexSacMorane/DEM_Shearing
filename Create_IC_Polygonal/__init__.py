@@ -222,7 +222,7 @@ def DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollic
             else :
                 print('i_DEM',dict_ic['i_DEM_IC'],'and Ecin',int(100*Ecin/Ecin_stop),'% and Confinement',int(100*Fv/dict_sollicitation['Vertical_Confinement_Force']),'%')
             if dict_ic['Debug_DEM'] :
-                Plot_Config_Loaded(dict_ic['L_g_tempo'],dict_sample['x_box_min'],dict_sample['x_box_max'],dict_sample['y_box_min'],dict_sample['y_box_max'],dict_ic['i_DEM_IC'])
+                Plot_Config_Loaded(dict_ic,dict_sample['x_box_min'],dict_sample['x_box_max'],dict_sample['y_box_min'],dict_sample['y_box_max'],dict_ic['i_DEM_IC'])
 
         #Check stop conditions for DEM
         if dict_ic['i_DEM_IC'] >= dict_ic['i_DEM_stop_IC'] + i_DEM_0:
@@ -533,7 +533,7 @@ def Reset_y_max(L_g,Force):
 
 #-------------------------------------------------------------------------------
 
-def Plot_Config_Loaded(L_g,x_min,x_max,y_min,y_max,i):
+def Plot_Config_Loaded(dict_ic,x_min,x_max,y_min,y_max,i):
     """
     Plot loaded configuration.
 
