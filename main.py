@@ -36,6 +36,7 @@ os.mkdir('Debug/Configuration/Init')
 os.mkdir('Debug/Configuration/Shear')
 
 simulation_report = Report.Report('Debug/Report.txt',datetime.now())
+simulation_report.tic_tempo(datetime.now())
 
 #get data
 dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations = User.All_parameters()
@@ -50,6 +51,28 @@ dict_algorithm['name_folder'] = dict_algorithm['template_simulation_name']+str(i
 
 #initial ic
 Create_IC.LG_tempo(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
+
+simulation_report.tac_tempo(datetime.now(), 'Loading with disks')
+
+#-------------------------------------------------------------------------------
+#Discretize grains
+#-------------------------------------------------------------------------------
+
+#change Parameters
+simulation_report.tic_tempo(datetime.now())
+dict_ic['Debug_DEM'] = True
+dict_ic['i_DEM_stop_IC'] = 6000
+
+simulation_report.write_and_print('Discretize the sample\n', 'Discretize the sample')
+
+dict_ic = Create_IC_Polygonal.Discretize_Grains(dict_ic, 60) #overwrite sphere dict_ic
+
+simulation_report.tac_tempo(datetime.now(), 'From disks to polygons')
+simulation_report.tic_tempo(datetime.now())
+
+#load discrete grains
+Create_IC_Polygonal.DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
+simulation_report.tac_tempo(datetime.now(), 'Loading with polygons')
 
 #-------------------------------------------------------------------------------
 #Define group
@@ -83,19 +106,16 @@ plt.close(1)
 dict_ic['L_contact_gw'] = []
 dict_ic['L_contact_gw_ij'] = []
 
+simulation_report.tac_tempo(datetime.now(), 'Define groups')
 
 #-------------------------------------------------------------------------------
-#Discretize grains
+#Shear simulation
 #-------------------------------------------------------------------------------
 
 #change Parameters
-dict_ic['Debug_DEM'] = True
-dict_ic['i_print_plot_IC'] = 100
+dict_ic['i_print_plot_IC'] = 50
 dict_ic['i_update_neighborhoods_com'] = 50
 
-simulation_report.write_and_print('Discretize the sample\n', 'Discretize the sample')
+#simulation_report.write_and_print('Shearing the sample\n', 'Shearing the sample')
 
-dict_ic = Create_IC_Polygonal.Discretize_Grains(dict_ic, 80)
-
-#load discrete grains
-Create_IC_Polygonal.DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
+#Shear_Polygonal.DEM_shear_load(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
