@@ -154,6 +154,7 @@ def DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollic
     Ecin_tracker = []
     Ecin_stop = 0
     Ymax_tracker = []
+    Fv_tracker = []
     for grain in dict_ic['L_g_tempo']:
         Force_stop = Force_stop + 0.5*grain.mass*dict_sollicitation['gravity']
         Ecin_stop = Ecin_stop + 0.5*grain.mass*(dict_ic['Ecin_ratio_IC']*grain.radius/dict_ic['dt_DEM_IC'])**2
@@ -270,6 +271,7 @@ def DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollic
         Force_tracker.append(F)
         Ecin_tracker.append(Ecin)
         Ymax_tracker.append(dict_sample['y_box_max'])
+        Fv_tracker.append(Fv)
 
         if dict_ic['i_DEM_IC'] % dict_ic['i_print_plot_IC'] ==0:
             if dict_sollicitation['gravity'] > 0 :
@@ -299,16 +301,16 @@ def DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollic
         fig, ((ax1, ax2)) = plt.subplots(1,2, figsize=(16,9),num=1)
 
         ax1.set_title('Total kinetic energy (e-12 J)')
-        ax1.plot(dict_ic['Ecin_tracker'])
-        ax1.plot([0, len(dict_ic['Ecin_tracker'])-1],[Ecin_stop, Ecin_stop],'r')
+        ax1.plot(Ecin_tracker)
+        ax1.plot([0, len(Ecin_tracker)-1],[Ecin_stop, Ecin_stop],'r')
 
         ax2.set_title('About the upper plate')
-        ax2.plot(dict_ic['Ymax_tracker'], color = 'blue')
+        ax2.plot(Ymax_tracker, color = 'blue')
         ax2.set_ylabel('Coordinate y (µm)', color = 'blue')
         ax2.tick_params(axis ='y', labelcolor = 'blue')
         ax2a = ax2.twinx()
-        ax2a.plot(range(50,len(dict_ic['Fv_tracker'])),dict_ic['Fv_tracker'][50:], color = 'orange')
-        ax2a.plot([50, len(dict_ic['Fv_tracker'])-1],[dict_sollicitation['Vertical_Confinement_Force'], dict_sollicitation['Vertical_Confinement_Force']], color = 'red')
+        ax2a.plot(range(50,len(Fv_tracker)),Fv_tracker[50:], color = 'orange')
+        ax2a.plot([50, len(Fv_tracker)-1],[dict_sollicitation['Vertical_Confinement_Force'], dict_sollicitation['Vertical_Confinement_Force']], color = 'red')
         ax2a.set_ylabel('Force applied (µN)', color = 'orange')
         ax2a.tick_params(axis ='y', labelcolor = 'orange')
 
