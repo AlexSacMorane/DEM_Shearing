@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt
 #Own function and class
 import Create_IC
 import Create_IC_Polygonal
-import Shear
+import Shear_Polygonal
 import Report
 import User
 
@@ -55,6 +55,8 @@ Create_IC.LG_tempo(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_s
 #Define group
 #-------------------------------------------------------------------------------
 
+simulation_report.tic_tempo(datetime.now())
+
 #define packs
 i_bottom = 0
 i_top = 0
@@ -81,18 +83,6 @@ plt.close(1)
 dict_ic['L_contact_gw'] = []
 dict_ic['L_contact_gw_ij'] = []
 
-#-------------------------------------------------------------------------------
-#Shear simulation with perfect sphere
-#-------------------------------------------------------------------------------
-
-#change Parameters
-#dict_ic['Debug_DEM'] = True
-#dict_ic['i_print_plot_IC'] = 50
-#dict_ic['i_update_neighborhoods_com'] = 50
-
-#simulation_report.write_and_print('Shearing the sample\n', 'Shearing the sample')
-
-#Shear.DEM_shear_load(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
 
 #-------------------------------------------------------------------------------
 #Discretize grains
