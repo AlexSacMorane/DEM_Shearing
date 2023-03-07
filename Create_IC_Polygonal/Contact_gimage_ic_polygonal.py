@@ -193,6 +193,7 @@ class Contact_Image_Tempo_Polygonal:
         Y_eq = 1/((1-self.g1.nu*self.g1.nu)/self.g1.y+(1-self.g2.nu*self.g2.nu)/self.g2.y)
         R_eq = 1/(1/self.g1.radius+1/self.g2.radius)
         k = 4/3*Y_eq*math.sqrt(R_eq)
+        self.k = k
         F_2_1_n = -k * overlap**(3/2)  #unlinear spring
         F_2_1 = F_2_1_n * PC_normal
         self.F_2_1_n = F_2_1_n
@@ -366,7 +367,7 @@ def Grains_contact_Neighborhoods(dict_ic,dict_material):
                    dict_ic['id_contact'] = dict_ic['id_contact'] + 1
 
             else :
-                if (i_grain,j_grain) in dict_ic['L_contact_ij_gimage'] : #contact detected previously is not anymore
+                if (grain.id, image.id) in dict_ic['L_contact_ij_gimage'] : #contact detected previously is not anymore
                        dict_ic['L_contact_gimage'].pop(dict_ic['L_contact_ij_gimage'].index((grain.id, image.id)))
                        dict_ic['L_contact_ij_gimage'].remove((grain.id, image.id))
 
