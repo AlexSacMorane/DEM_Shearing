@@ -32,7 +32,8 @@ if Path('Debug').exists():
     shutil.rmtree('Debug')
 os.mkdir('Debug')
 os.mkdir('Debug/Configuration')
-os.mkdir('Debug/Configuration/Init')
+os.mkdir('Debug/Configuration/Init_disks')
+os.mkdir('Debug/Configuration/Init_polygons')
 os.mkdir('Debug/Configuration/Shear')
 
 simulation_report = Report.Report('Debug/Report.txt',datetime.now())
@@ -60,8 +61,8 @@ simulation_report.tac_tempo(datetime.now(), 'Loading with disks')
 
 #change Parameters
 simulation_report.tic_tempo(datetime.now())
-dict_ic['Debug_DEM'] = True
 dict_ic['i_DEM_stop_IC'] = 6000
+dict_ic['i_print_plot_IC'] = 100
 
 simulation_report.write_and_print('Discretize the sample\n', 'Discretize the sample')
 
@@ -114,7 +115,5 @@ simulation_report.tac_tempo(datetime.now(), 'Define groups')
 
 #change Parameters
 simulation_report.write_and_print('Shearing the sample\n', 'Shearing the sample')
-dict_ic['i_print_plot_IC'] = 50
-dict_ic['i_update_neighborhoods_com'] = 50
 
 #Shear_Polygonal.DEM_shear_load(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
