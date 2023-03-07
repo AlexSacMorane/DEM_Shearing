@@ -275,3 +275,5 @@ class Grain_Image_Polygonal(Grain_Tempo_Polygonal):
     self.v = self.real.v.copy()
     self.w = self.real.w
     self.theta = self.real.theta
+    self.l_r = self.real.l_r.copy()
+    self.l_theta_r = self.real.l_theta_r.copy()
