@@ -14,7 +14,7 @@ import numpy  as np
 import math
 
 #Own
-import Create_IC.Grain_ic
+import Create_IC_Polygonal.Grain_ic_polygonal
 
 #-------------------------------------------------------------------------------
 #Class
@@ -203,48 +203,36 @@ def Grains_Polyhedral_Wall_contact_Neighborhood(wall_neighborhood,x_box_min,x_bo
         Output :
             Nothing, but the initial condition dictionnary is updated with the contact grain - walls.
   """
-  #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-
-  #load data needed
-  L_ij_contact_gw = dict_ic['L_contact_gw_ij']
-  L_contact_gw = dict_ic['L_contact_gw']
-  id_contact = dict_ic['id_contact']
-  #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-
-
   for grain in wall_neighborhood:
 
       p_x_min = min(grain.l_border_x)
       p_x_max = max(grain.l_border_x)
       p_y_min = min(grain.l_border_y)
       p_y_max = max(grain.l_border_y)
-      
-      #grain-wall y_min
-      if p_y_min < y_box_min and (grain.id,-3) not in L_ij_contact_gw:
-          overlap = y_box_min - p_y_min
-          L_contact_gw.append(Contact_gw_Tempo_Polygonal(id_contact, grain, dict_material, 'gwy_min', y_box_min, overlap))
-          L_ij_contact_gw.append((grain.id,-3))
-          id_contact = id_contact + 1
-      elif p_y_min < y_box_min and (grain.id,-3) in L_ij_contact_gw:
-          overlap = y_box_min - p_y_min
-          L_contact_gw[L_ij_contact_gw.index((grain.id,-3))].update_overlap(overlap)
-      elif p_y_min > y_box_min and (grain.id,-3) in L_ij_contact_gw:
-          i_contact = L_ij_contact_gw.index((grain.id,-3))
-          L_contact_gw.pop(i_contact)
-          L_ij_contact_gw.pop(i_contact)
-      #grain-wall y_max
-      if p_y_max > y_box_max and (grain.id,-4) not in L_ij_contact_gw:
-          overlap = p_y_max - y_box_max
-          L_contact_gw.append(Contact_gw_Tempo_Polygonal(id_contact, grain, dict_material, 'gwy_max', y_box_max, overlap))
-          L_ij_contact_gw.append((grain.id,-4))
-          id_contact = id_contact + 1
-      elif p_y_max > y_box_max and (grain.id,-4) in L_ij_contact_gw:
-          overlap = p_y_max - y_box_max
-          L_contact_gw[L_ij_contact_gw.index((grain.id,-4))].update_overlap(overlap)
-      elif p_y_max < y_box_max and (grain.id,-4) in L_ij_contact_gw:
-          i_contact = L_ij_contact_gw.index((grain.id,-4))
-          L_contact_gw.pop(i_contact)
-          L_ij_contact_gw.pop(i_contact)
 
-      #Update dict
-      dict_ic['L_contact_gw_ij'] = L_ij_contact_gw
-      dict_ic['L_contact_gw'] = L_contact_gw
-      dict_ic['id_contact'] = id_contact
+      #grain-wall y_min
+      if p_y_min < y_box_min and (grain.id,-3) not in dict_ic['L_contact_gw_ij']:
+          overlap = y_box_min - p_y_min
+          dict_ic['L_contact_gw'].append(Contact_gw_Tempo_Polygonal(dict_ic['id_contact'], grain, dict_material, 'gwy_min', y_box_min, overlap))
+          dict_ic['L_contact_gw_ij'].append((grain.id,-3))
+          dict_ic['id_contact'] = dict_ic['id_contact'] + 1
+      elif p_y_min < y_box_min and (grain.id,-3) in dict_ic['L_contact_gw_ij']:
+          overlap = y_box_min - p_y_min
+          dict_ic['L_contact_gw'][dict_ic['L_contact_gw_ij'].index((grain.id,-3))].update_overlap(overlap)
+      elif p_y_min > y_box_min and (grain.id,-3) in dict_ic['L_contact_gw_ij']:
+          i_contact = dict_ic['L_contact_gw_ij'].index((grain.id,-3))
+          dict_ic['L_contact_gw'].pop(i_contact)
+          dict_ic['L_contact_gw_ij'].pop(i_contact)
+      #grain-wall y_max
+      if p_y_max > y_box_max and (grain.id,-4) not in dict_ic['L_contact_gw_ij']:
+          overlap = p_y_max - y_box_max
+          dict_ic['L_contact_gw'].append(Contact_gw_Tempo_Polygonal(dict_ic['id_contact'], grain, dict_material, 'gwy_max', y_box_max, overlap))
+          dict_ic['L_contact_gw_ij'].append((grain.id,-4))
+          dict_ic['id_contact'] = dict_ic['id_contact'] + 1
+      elif p_y_max > y_box_max and (grain.id,-4) in dict_ic['L_contact_gw_ij']:
+          overlap = p_y_max - y_box_max
+          dict_ic['L_contact_gw'][dict_ic['L_contact_gw_ij'].index((grain.id,-4))].update_overlap(overlap)
+      elif p_y_max < y_box_max and (grain.id,-4) in dict_ic['L_contact_gw_ij']:
+          i_contact = dict_ic['L_contact_gw_ij'].index((grain.id,-4))
+          dict_ic['L_contact_gw'].pop(i_contact)
+          dict_ic['L_contact_gw_ij'].pop(i_contact)
