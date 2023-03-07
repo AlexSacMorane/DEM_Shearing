@@ -113,9 +113,8 @@ simulation_report.tac_tempo(datetime.now(), 'Define groups')
 #-------------------------------------------------------------------------------
 
 #change Parameters
+simulation_report.write_and_print('Shearing the sample\n', 'Shearing the sample')
 dict_ic['i_print_plot_IC'] = 50
 dict_ic['i_update_neighborhoods_com'] = 50
-
-#simulation_report.write_and_print('Shearing the sample\n', 'Shearing the sample')
 
 #Shear_Polygonal.DEM_shear_load(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
