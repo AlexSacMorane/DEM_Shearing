@@ -297,11 +297,6 @@ def Debug_Trackers_DEM(dict_algorithm,dict_sollicitations,dict_tracker):
     ax2.set_title('Mean force applied (µN)')
     ax2.plot(dict_tracker['Force_applied'])
 
-    ax3.set_title('k0s (-)')
-    ax3.plot(dict_tracker['k0_xmin'],label='xmin')
-    ax3.plot(dict_tracker['k0_xmax'],label='xmax')
-    ax3.legend()
-
     ax4.set_title('About the upper plate')
     ax4.plot(dict_tracker['y_box_max'], color = 'blue')
     ax4.set_ylabel('Coordinate y (µm)', color = 'blue')
