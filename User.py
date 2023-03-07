@@ -34,7 +34,7 @@ def All_parameters():
     #---------------------------------------------------------------------------
     #Geometric parameters
 
-    N_grain = 200 #total number of grains
+    N_grain = 80 #total number of grains
 
     #Disk
     R_mean = 350 #µm radius to compute the grain distribution. Then recomputed
@@ -45,13 +45,9 @@ def All_parameters():
     for i in range(len(L_R)):
         R_mean = R_mean + L_R[i]*L_percentage_R[i]
 
-    #Compute number of grain (square or disk)
-    N_grain_disk = N_grain
-
     #write dict
     dict_geometry = {
     'N_grain' : N_grain,
-    'N_grain_disk' : N_grain_disk,
     'R_mean' : R_mean,
     'L_R' : L_R,
     'L_percentage_R' : L_percentage_R
@@ -87,11 +83,10 @@ def All_parameters():
     #---------------------------------------------------------------------------
     #Sample definition
 
-    Lenght_mean = R_mean*N_grain_disk /N_grain #mean characteristic lenght
-
     #Box définition
+    H_D_ratio = 1.5
     x_box_min = 0 #µm
-    x_box_max = 2*Lenght_mean*math.sqrt(N_grain) #µm
+    x_box_max = 2*R_mean*math.sqrt(N_grain/H_D_ratio) #µm
     y_box_min = 0 #µm
 
     #write dict
@@ -120,18 +115,14 @@ def All_parameters():
 
     #DEM parameters
     dt_DEM_crit = math.pi*min(L_R)/(0.16*nu+0.88)*math.sqrt(rho*(2+2*nu)/Y) #s critical time step from O'Sullivan 2011
-
     dt_DEM = dt_DEM_crit/8 #s time step during DEM simulation
     factor_neighborhood = 1.5 #margin to detect a grain into a neighborhood
     i_update_neighborhoods = 100 #the frequency of the update of the neighborhood of the grains and the walls
     Spring_type = 'Ponctual' #Kind of contact
-    d_to_image = 3.1 * max(L_R)
+    d_to_image = 2 * max(L_R)
     #Stop criteria of the DEM
     i_DEM_stop = 3000 #maximum iteration for one DEM simulation
     Ecin_ratio = 0.0002
-    n_window_stop = 50
-    dk0_stop = 0.05
-    dy_box_max_stop = 0.5
 
     #PF-DEM
     n_t_PFDEM = 10 #number of cycle PF-DEM
@@ -161,9 +152,6 @@ def All_parameters():
     'd_to_image' : d_to_image,
     'i_DEM_stop' : i_DEM_stop,
     'Ecin_ratio' : Ecin_ratio,
-    'n_window_stop' : n_window_stop,
-    'dk0_stop' : dk0_stop,
-    'dy_box_max_stop' : dy_box_max_stop,
     'n_t_PFDEM' : n_t_PFDEM,
     'MovePF_selector' : MovePF_selector,
     'Spring_type' : Spring_type,
@@ -182,7 +170,7 @@ def All_parameters():
     #---------------------------------------------------------------------------
     #Initial condition parameters
 
-    n_generation = 2 #number of grains generation
+    n_generation = 1 #number of grains generation
     factor_ymax_box = 1.8 #margin to generate grains
     N_test_max = 5000 # maximum number of tries to generate a grain without overlap
     i_DEM_stop_IC = 4000 #stop criteria for DEM during IC
@@ -224,12 +212,8 @@ def All_parameters():
     Shear_velocity = U_shear/dt_DEM_IC
     Shear_strain_target = 1.5 #total shear displacement / initial sample height
 
-    #Add energy to dissolved grain
-    Dissolution_Energy = 0.2
-
     #write dict
     dict_sollicitations = {
-    'Dissolution_Energy' : Dissolution_Energy,
     'Vertical_Confinement_Force' : Vertical_Confinement_Force,
     'gravity' : gravity,
     'Shear_velocity' : Shear_velocity,
@@ -239,19 +223,3 @@ def All_parameters():
     #---------------------------------------------------------------------------
 
     return dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations
-
-#-------------------------------------------------------------------------------
-
-def Criteria_StopSimulation(dict_algorithm):
-    """
-    Criteria to stop simulation (PF and DEM).
-
-        Input :
-            an algorithm dictionnary (a dict)
-        Output :
-            a Booean (True if the simulation must be stopped)
-    """
-    Criteria_Verified = False
-    if dict_algorithm['i_PF'] >= dict_algorithm['n_t_PFDEM']:
-        Criteria_Verified = True
-    return Criteria_Verified
