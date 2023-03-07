@@ -294,6 +294,27 @@ def DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollic
     #Update dict
     dict_ic['L_L_g_tempo'].append(dict_ic['L_g_tempo'].copy())
 
+    #plot trackers
+    if dict_ic['Debug_DEM'] and dict_ic['i_generation'] == dict_ic['n_generation']+1 :
+        fig, ((ax1, ax2)) = plt.subplots(1,2, figsize=(16,9),num=1)
+
+        ax1.set_title('Total kinetic energy (e-12 J)')
+        ax1.plot(dict_ic['Ecin_tracker'])
+        ax1.plot([0, len(dict_ic['Ecin_tracker'])-1],[Ecin_stop, Ecin_stop],'r')
+
+        ax2.set_title('About the upper plate')
+        ax2.plot(dict_ic['Ymax_tracker'], color = 'blue')
+        ax2.set_ylabel('Coordinate y (µm)', color = 'blue')
+        ax2.tick_params(axis ='y', labelcolor = 'blue')
+        ax2a = ax2.twinx()
+        ax2a.plot(range(50,len(dict_ic['Fv_tracker'])),dict_ic['Fv_tracker'][50:], color = 'orange')
+        ax2a.plot([50, len(dict_ic['Fv_tracker'])-1],[dict_sollicitation['Vertical_Confinement_Force'], dict_sollicitation['Vertical_Confinement_Force']], color = 'red')
+        ax2a.set_ylabel('Force applied (µN)', color = 'orange')
+        ax2a.tick_params(axis ='y', labelcolor = 'orange')
+
+        fig.savefig('Debug/Init_disks_trackers.png')
+        plt.close(1)
+
 #-------------------------------------------------------------------------------
 
 def Create_grains(dict_ic, dict_geometry, dict_sample, dict_material, simulation_report):
@@ -637,7 +658,7 @@ def Plot_Config_Loaded(dict_ic,x_min,x_max,y_min,y_max,i):
     plt.plot([x_min,x_max],[y_min,y_min],'k')
     plt.plot([x_min,x_max],[y_max,y_max],'k')
     plt.axis('equal')
-    plt.savefig('Debug/Configuration/Init/Config_Loaded_'+str(i)+'.png')
+    plt.savefig('Debug/Configuration/Init_disks/Config_Loaded_'+str(i)+'.png')
     plt.close(1)
 
 #-------------------------------------------------------------------------------
