@@ -137,6 +137,9 @@ class Grain_Tempo_Polygonal:
         self.l_border_x[i] = self.l_border_x[i] + self.v[0]*dt_DEM
         self.l_border_y[i] = self.l_border_y[i] + self.v[1]*dt_DEM
     self.center = self.center + self.v*dt_DEM
+    if self.track_u :
+        self.total_ux = self.total_ux + self.v[0]*dt_DEM
+        self.total_uy = self.total_uy + self.v[1]*dt_DEM
 
     #rotation
     dw_i = self.mz/self.inertia

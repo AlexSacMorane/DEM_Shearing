@@ -304,7 +304,7 @@ def Reset_y_max(L_g):
 
 #-------------------------------------------------------------------------------
 
-def Plot_Config_Loaded(dict_ic,x_min,x_max,y_min,y_max,i):
+def Plot_Config_Loaded(dict_ic,i):
     """
     Plot loaded configuration.
 
@@ -315,15 +315,17 @@ def Plot_Config_Loaded(dict_ic,x_min,x_max,y_min,y_max,i):
         Output :
             Nothing, but a .png file is generated (a file)
     """
+    L_color_group = ['k','r','b']
+    L_group = ['Current', 'Bottom', 'Top']
     plt.figure(1,figsize=(16,9))
     for grain in dict_ic['L_g_tempo']:
-        plt.plot(grain.l_border_x,grain.l_border_y,'k')
-        plt.plot(grain.center[0],grain.center[1],'xk')
+        for i_group in range(len(L_group)):
+            if grain.group == L_group[i_group] :
+                plt.plot(grain.l_border_x,grain.l_border_y,L_color_group[i_group])
     for grain in dict_ic['L_g_image']:
-        plt.plot(grain.l_border_x,grain.l_border_y,'-.k')
-        plt.plot(grain.center[0],grain.center[1],'xk')
-    plt.plot([x_min,x_max],[y_min,y_min],'k')
-    plt.plot([x_min,x_max],[y_max,y_max],'k')
+        for i_group in range(len(L_group)):
+            if grain.group == L_group[i_group]:
+                plt.plot(grain.l_border_x,grain.l_border_y,'-.', color = L_color_group[i_group])
     plt.axis('equal')
     plt.savefig('Debug/Configuration/Shear/Config_Loaded_'+str(i)+'.png')
     plt.close(1)
