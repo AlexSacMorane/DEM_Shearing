@@ -180,7 +180,7 @@ def All_parameters():
     Ecin_ratio_IC = 0.0005
     factor_neighborhood_IC = 1.5 #margin to detect a grain into a neighborhood
     i_update_neighborhoods_gen = 20 #the frequency of the update of the neighborhood of the grains and the walls during IC generations
-    i_update_neighborhoods_com = 50 #the frequency of the update of the neighborhood of the grains and the walls during IC combination
+    i_update_neighborhoods_com = 100 #the frequency of the update of the neighborhood of the grains and the walls during IC combination
 
     #write dict
     dict_ic = {

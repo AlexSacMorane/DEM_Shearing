@@ -114,6 +114,10 @@ simulation_report.tac_tempo(datetime.now(), 'Define groups')
 #-------------------------------------------------------------------------------
 
 #change Parameters
+simulation_report.tic_tempo(datetime.now())
 simulation_report.write_and_print('Shearing the sample\n', 'Shearing the sample')
 
-#Shear_Polygonal.DEM_shear_load(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
+#shear sample
+Shear_Polygonal.DEM_shear_load(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
+
+simulation_report.tac_tempo(datetime.now(), 'Shearing')
