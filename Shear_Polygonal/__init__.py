@@ -191,7 +191,7 @@ def DEM_shear_load(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sol
 
     #plot total displacement field
     Plot_total_U(dict_ic)
-    
+
 #-------------------------------------------------------------------------------
 
 def Control_Top_NR(Force_target,L_contact_gg,L_g):
@@ -325,7 +325,7 @@ def Plot_Config_Loaded(dict_ic,x_min,x_max,y_min,y_max,i):
     plt.plot([x_min,x_max],[y_min,y_min],'k')
     plt.plot([x_min,x_max],[y_max,y_max],'k')
     plt.axis('equal')
-    plt.savefig('Debug/Configuration/Init/Config_Loaded_'+str(i)+'.png')
+    plt.savefig('Debug/Configuration/Shear/Config_Loaded_'+str(i)+'.png')
     plt.close(1)
 
 #-------------------------------------------------------------------------------
