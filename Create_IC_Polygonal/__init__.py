@@ -255,11 +255,11 @@ def DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollic
         ax2.tick_params(axis ='y', labelcolor = 'blue')
         ax2a = ax2.twinx()
         ax2a.plot(range(50,len(dict_ic['Fv_tracker'])),dict_ic['Fv_tracker'][50:], color = 'orange')
-        ax2a.plot([50, len(dict_ic['Fv_tracker'])-1],[dict_sollicitations['Vertical_Confinement_Force'], dict_sollicitations['Vertical_Confinement_Force']], color = 'red')
+        ax2a.plot([50, len(dict_ic['Fv_tracker'])-1],[dict_sollicitation['Vertical_Confinement_Force'], dict_sollicitation['Vertical_Confinement_Force']], color = 'red')
         ax2a.set_ylabel('Force applied (µN)', color = 'orange')
         ax2a.tick_params(axis ='y', labelcolor = 'orange')
 
-        fig.savefig('Debug/Init_Trackers.png')
+        fig.savefig('Debug/Init_polygons_trackers.png')
         plt.close(1)
 
 #-------------------------------------------------------------------------------
@@ -554,7 +554,7 @@ def Plot_Config_Loaded(dict_ic,x_min,x_max,y_min,y_max,i):
     plt.plot([x_min,x_max],[y_min,y_min],'k')
     plt.plot([x_min,x_max],[y_max,y_max],'k')
     plt.axis('equal')
-    plt.savefig('Debug/Configuration/Init/Config_Loaded_'+str(i)+'.png')
+    plt.savefig('Debug/Configuration/Init_polygons/Config_Loaded_'+str(i)+'.png')
     plt.close(1)
 
 #-------------------------------------------------------------------------------
