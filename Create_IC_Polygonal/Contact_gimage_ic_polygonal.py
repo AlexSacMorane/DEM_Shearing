@@ -360,7 +360,7 @@ def Grains_contact_Neighborhoods(dict_ic,dict_material):
             j_neighbor = neighbor.id
             image = neighbor
             if Grains_Polyhedral_contact_f(grain,image):
-                if (grain.id, image.id) not in dict_ic['L_contact_ij']:  #contact not detected previously
+                if (grain.id, image.id) not in dict_ic['L_contact_ij_gimage']:  #contact not detected previously
                    #creation of contact
                    dict_ic['L_contact_ij_gimage'].append((grain.id, image.id))
                    dict_ic['L_contact_gimage'].append(Contact_Image_Tempo_Polygonal(dict_ic['id_contact'], grain, image, dict_material))
