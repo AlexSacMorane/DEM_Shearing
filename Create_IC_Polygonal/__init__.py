@@ -148,6 +148,24 @@ def DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollic
             contact.normal()
             contact.tangential(dict_ic['dt_DEM_IC'])
 
+        #Delete contacts gg and gimage with no overlap
+        L_i_toremove = []
+        for i_contact in range(len(dict_ic['L_contact'])):
+            if dict_ic['L_contact'][i_contact].overlap_normal < 0:
+                L_i_toremove.append(i_contact)
+        L_i_toremove.reverse()
+        for i_toremove in L_i_toremove:
+            dict_ic['L_contact'].pop(i_toremove)
+            dict_ic['L_contact_ij'].pop(i_toremove)
+        L_i_toremove = []
+        for i_contact in range(len(dict_ic['L_contact_gimage'])):
+            if dict_ic['L_contact_gimage'][i_contact].overlap_normal < 0:
+                L_i_toremove.append(i_contact)
+        L_i_toremove.reverse()
+        for i_toremove in L_i_toremove:
+            dict_ic['L_contact_gimage'].pop(i_toremove)
+            dict_ic['L_contact_ij_gimage'].pop(i_toremove)
+
         #Move grains
         for grain in dict_ic['L_g_tempo']:
             grain.euler_semi_implicite(dict_ic['dt_DEM_IC'],10*dict_ic['Ecin_ratio_IC'])
@@ -222,6 +240,27 @@ def DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollic
     dict_ic['Ecin_tracker'] = Ecin_tracker
     dict_ic['Ymax_tracker'] = Ymax_tracker
     dict_ic['Fv_tracker'] = Fv_tracker
+
+    #plot trackers
+    if dict_ic['Debug_DEM'] :
+        fig, ((ax1, ax2)) = plt.subplots(1,2, figsize=(16,9),num=1)
+
+        ax1.set_title('Total kinetic energy (e-12 J)')
+        ax1.plot(dict_ic['Ecin_tracker'])
+        ax1.plot([0, len(dict_ic['Ecin_tracker'])-1],[Ecin_stop, Ecin_stop],'r')
+
+        ax2.set_title('About the upper plate')
+        ax2.plot(dict_ic['Ymax_tracker'], color = 'blue')
+        ax2.set_ylabel('Coordinate y (µm)', color = 'blue')
+        ax2.tick_params(axis ='y', labelcolor = 'blue')
+        ax2a = ax2.twinx()
+        ax2a.plot(range(50,len(dict_ic['Fv_tracker'])),dict_ic['Fv_tracker'][50:], color = 'orange')
+        ax2a.plot([50, len(dict_ic['Fv_tracker'])-1],[dict_sollicitations['Vertical_Confinement_Force'], dict_sollicitations['Vertical_Confinement_Force']], color = 'red')
+        ax2a.set_ylabel('Force applied (µN)', color = 'orange')
+        ax2a.tick_params(axis ='y', labelcolor = 'orange')
+
+        fig.savefig('Debug/Init_Trackers.png')
+        plt.close(1)
 
 #-------------------------------------------------------------------------------
 
@@ -302,7 +341,7 @@ def convert_gg_into_gimage(grain, dict_ic, dict_material):
                     image = dict_ic['L_g_image'][i_image]
                 #creation of contact
                 dict_ic['L_contact_ij_gimage'].append(ij_gimage)
-                dict_ic['L_contact_gimage'].append(Create_IC_Polygonal.Contact_gimage_ic_Polygonal.Contact_Image_Tempo_Polygonal(dict_ic['id_contact'], grain, image, dict_material))
+                dict_ic['L_contact_gimage'].append(Create_IC_Polygonal.Contact_gimage_ic_polygonal.Contact_Image_Tempo_Polygonal(dict_ic['id_contact'], grain, image, dict_material))
                 dict_ic['id_contact'] = dict_ic['id_contact'] + 1
                 #transmit data
                 dict_ic['L_contact_gimage'][-1].convert_gimage_in_gg(dict_ic['L_contact'][i_contact_ij])
@@ -322,9 +361,6 @@ def convert_gg_into_gimage(grain, dict_ic, dict_material):
                 image = dict_ic['L_g_image'][i_image]
                 while not image.id == ij_gimage[1] :
                     i_image = i_image + 1
-                    if i_image == len(dict_ic['L_g_image']):
-                        print('Bug', ij_gimage, i_grain, image.id)
-                        print(dict_ic['L_i_image'])
                     image = dict_ic['L_g_image'][i_image]
                 #creation of contact
                 dict_ic['L_contact_ij_gimage'].append(ij_gimage)
@@ -509,18 +545,14 @@ def Plot_Config_Loaded(L_g,x_min,x_max,y_min,y_max,i):
             Nothing, but a .png file is generated (a file)
     """
     plt.figure(1,figsize=(16,9))
-    L_x = []
-    L_y = []
-    L_u = []
-    L_v = []
-    for grain in L_g:
+    for grain in dict_ic['L_g_tempo']:
         plt.plot(grain.l_border_x,grain.l_border_y,'k')
         plt.plot(grain.center[0],grain.center[1],'xk')
-        L_x.append(grain.center[0])
-        L_y.append(grain.center[1])
-        L_u.append(grain.fx)
-        L_v.append(grain.fy)
-    plt.plot([x_min,x_min,x_max,x_max,x_min],[y_max,y_min,y_min,y_max,y_max],'k')
+    for grain in dict_ic['L_g_image']:
+        plt.plot(grain.l_border_x,grain.l_border_y,'-.k')
+        plt.plot(grain.center[0],grain.center[1],'xk')
+    plt.plot([x_min,x_max],[y_min,y_min],'k')
+    plt.plot([x_min,x_max],[y_max,y_max],'k')
     plt.axis('equal')
     plt.savefig('Debug/Configuration/Init/Config_Loaded_'+str(i)+'.png')
     plt.close(1)
